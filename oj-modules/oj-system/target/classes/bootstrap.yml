@@ -1,0 +1,7 @@
+server:
+  port: 8080
+
+# 配置 spring 项目的名字
+spring:
+  application:
+    name: oj-system

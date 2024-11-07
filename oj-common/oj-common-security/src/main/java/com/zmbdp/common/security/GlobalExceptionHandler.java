@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResultFormat<?>
     handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
+        log.error("请求地址'{}', 不支持'{}'请求", requestURI, e.getMethod());
         return ResultFormat.fail(ResultCode.ERROR);
     }
 
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResultFormat<?> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生异常.", requestURI, e);
+        log.error("请求地址'{}', 发生异常.", requestURI, e);
         return ResultFormat.fail(ResultCode.ERROR);
     }
 
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResultFormat<?> handleException(Exception e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生异常.", requestURI, e);
+        log.error("请求地址'{}', 发生异常.", requestURI, e);
         return ResultFormat.fail(ResultCode.ERROR);
     }
 }

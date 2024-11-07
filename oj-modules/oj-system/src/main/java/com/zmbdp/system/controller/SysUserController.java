@@ -40,6 +40,7 @@ public class SysUserController {
             // 直接整个都是空的话说明不是为输入了，是前端出了问题，参数根本没传
             return ResultFormat.fail(ResultCode.ERROR);
         }
+//        int a = 10 / 0;
         String userAccount = loginDTO.getUserAccount();
         String password = loginDTO.getPassword();
         if (StringUtils.isEmpty(userAccount) || StringUtils.isEmpty(password)) {

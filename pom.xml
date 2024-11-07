@@ -32,6 +32,7 @@
         <oj-common-core.version>1.0-SNAPSHOT</oj-common-core.version>
         <springdoc-openapi.version>2.2.0</springdoc-openapi.version>
         <oj-common-swagger.version>1.0-SNAPSHOT</oj-common-swagger.version>
+        <oj-common-security.version>1.0-SNAPSHOT</oj-common-security.version>
     </properties>
 
     <dependencies>

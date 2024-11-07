@@ -33,12 +33,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>oj-common</artifactId>
-            <version>${oj-common-core.version}</version>
-        </dependency>
-
 
         <dependency>
             <groupId>com.zmbdp</groupId>
@@ -47,6 +41,11 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>oj-common-security</artifactId>
+            <version>${oj-common-security.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

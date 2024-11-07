@@ -20,20 +20,15 @@ public class SysUserServiceImpl implements ISysUserService {
     public ResultFormat<Void> login(String userAccount, String password) {
         // 1. 先通过账号查询用户信息
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-        ResultFormat resultFormat = new ResultFormat();
         SysUser sysUser = sysUserMapper.selectOne(queryWrapper.
                 select(SysUser::getPassword). // 只查询出这个账户的密码
                         eq(SysUser::getUserAccount, // 表示 数据库字段，这里实际上指向 SysUser 类中的 userAccount 属性，它映射到数据库的 user_account 字段。
                         userAccount));// 传入的 userAccount 字段
         if (sysUser == null || !BCryptUtils.matchPassword(password, sysUser.getPassword())) {
             // 表示用户不存在或者说密码错误，一起输出了，增加安全性
-            resultFormat.setCode(ResultCode.FAILED_LOGIN.getCode());
-            resultFormat.setMsg(ResultCode.FAILED_LOGIN.getMsg());
-        } else {
-            // 表示全都对上了
-            resultFormat.setCode(ResultCode.SUCCESS.getCode());
-            resultFormat.setMsg(ResultCode.SUCCESS.getMsg());
+            return ResultFormat.fail(ResultCode.FAILED_LOGIN);
         }
-        return resultFormat;
+        // 表示全都对上了
+        return ResultFormat.success();
     }
 }

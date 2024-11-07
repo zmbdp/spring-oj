@@ -31,6 +31,13 @@ public class ResultFormat<T> {
     }
 
     // 如果说这个失败，有 message 参数的话就这么搞
+
+    /**
+     * 指定错误码的返回格式
+     * @param resultCode 指定的错误码
+     * @return
+     * @param <T>
+     */
     public static <T> ResultFormat<T> fail(ResultCode resultCode) {
         return assembleResult(resultCode, null);
     }

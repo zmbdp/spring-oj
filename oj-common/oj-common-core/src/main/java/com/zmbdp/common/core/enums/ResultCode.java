@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResultCode {
     // 成功的
-    SUCCESS(1000, "登录成功"),
+    SUCCESS(1000, "操作成功"),
 
     // 服务器内部错误，友好提示
     ERROR(2000, "服务器繁忙，请稍后重试"),

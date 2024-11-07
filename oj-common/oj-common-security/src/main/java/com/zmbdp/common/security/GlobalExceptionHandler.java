@@ -23,12 +23,12 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 拦截运行时异常
+     * 运行时异常
      */
     @ExceptionHandler(RuntimeException.class)
     public ResultFormat<?> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}', 发生异常.", requestURI, e);
+        log.error("请求地址'{}', 发生运行时异常.", requestURI, e);
         return ResultFormat.fail(ResultCode.ERROR);
     }
 

@@ -1,7 +1,0 @@
-server:
-  port: 8083
-
-# 配置 spring 项目的名字
-spring:
-  application:
-    name: oj-judge

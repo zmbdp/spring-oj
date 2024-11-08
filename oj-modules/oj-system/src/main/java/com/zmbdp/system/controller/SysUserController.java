@@ -57,7 +57,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "2000", description = "服务繁忙请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户已存在")
     public ResultFormat<Void> add(@RequestBody(required = false) SysUserSaveDTO sysUserSaveDTO) {
-        System.out.println("aaa");
+        System.out.println("sysAdd");
         return null;
     }
 
@@ -75,6 +75,7 @@ public class SysUserController {
         if (userId == null) {
             // 这里就是未选择 userId，让管理员选择
         }
+        System.out.println("sysDelete");
         // 这里是删除操作的实现
         return null;
     }
@@ -94,6 +95,7 @@ public class SysUserController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String sex
     ) {
+        System.out.println("sysDetail");
         // 这里是查询操作的实现
         return null;
     }

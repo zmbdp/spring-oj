@@ -35,7 +35,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "3001", description = "未授权")
     @ApiResponse(responseCode = "3103", description = "用户或密码错误")
     @ApiResponse(responseCode = "3105", description = "用户名或密码为输入")
-    public ResultFormat<Void> login(@RequestBody(required = false) LoginDTO loginDTO) { // 加上 (required = false) 是因为怕前端出现问题了，传过来的 body 就算为空也能正确处理请求
+    public ResultFormat<String> login(@RequestBody(required = false) LoginDTO loginDTO) { // 加上 (required = false) 是因为怕前端出现问题了，传过来的 body 就算为空也能正确处理请求
         if (loginDTO == null) {
             // 直接整个都是空的话说明不是为输入了，是前端出了问题，参数根本没传
             return ResultFormat.fail(ResultCode.ERROR);
@@ -57,7 +57,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "2000", description = "服务繁忙请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户已存在")
     public ResultFormat<Void> add(@RequestBody(required = false) SysUserSaveDTO sysUserSaveDTO) {
-        System.out.println("aaa");
+        System.out.println("sysAdd");
         return null;
     }
 
@@ -75,6 +75,7 @@ public class SysUserController {
         if (userId == null) {
             // 这里就是未选择 userId，让管理员选择
         }
+        System.out.println("sysDelete");
         // 这里是删除操作的实现
         return null;
     }
@@ -94,6 +95,7 @@ public class SysUserController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String sex
     ) {
+        System.out.println("sysDetail");
         // 这里是查询操作的实现
         return null;
     }

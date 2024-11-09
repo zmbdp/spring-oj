@@ -27,7 +27,7 @@ public class JwtUtils {
      * @param secret 密钥
      * @return 数据
      */
-    public static Claims parseToken(String token, String secret) {
+    public static Claims getTokenMsg(String token, String secret) {
         return Jwts.parser()
                    .setSigningKey(secret)
                    .parseClaimsJws(token)

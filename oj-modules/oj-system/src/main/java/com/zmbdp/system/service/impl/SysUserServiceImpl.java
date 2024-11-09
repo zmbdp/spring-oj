@@ -1,9 +1,15 @@
 package com.zmbdp.system.service.impl;
 
+import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.zmbdp.common.core.constants.CacheConstants;
+import com.zmbdp.common.core.constants.JwtConstants;
 import com.zmbdp.common.core.domain.ResultFormat;
 import com.zmbdp.common.core.enums.ResultCode;
+import com.zmbdp.common.core.enums.UserIdentity;
+import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.common.security.utils.JwtUtils;
+import com.zmbdp.system.domain.LoginUser;
 import com.zmbdp.system.domain.SysUser;
 import com.zmbdp.system.mapper.SysUserMapper;
 import com.zmbdp.system.service.ISysUserService;
@@ -15,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 // service 类的实现类
 @Service
@@ -25,6 +32,8 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Value("${jwt.secret}")
     private String secret;
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public ResultFormat<String> login(String userAccount, String password) {
@@ -40,8 +49,17 @@ public class SysUserServiceImpl implements ISysUserService {
         }
         // 表示全都对上了，生成一个 Token 返回给前端，后面携带这些信息，直接来验证
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", sysUser.getUserId());
+        String userKey = UUID.fastUUID().toString(); // 把 hutool 产生的 UUID 当作唯一主键
+        claims.put(JwtConstants.LOGIN_USER_ID, sysUser.getUserId());
+        claims.put(JwtConstants.LOGIN_USER_KEY, userKey);
         String token = JwtUtils.createToken(claims, secret);
+        // 然后使用 redis 存储敏感信息
+        String key = CacheConstants.LOGIN_TOKEN_KEY + userKey; // 然后拼接好当作 redis 的主键
+        LoginUser loginUser = new LoginUser();
+        loginUser.setIdentity(UserIdentity.ADMIN.getValue()); // 是管理员，所以设置成 2
+        redisService.setCacheObject(key, loginUser, CacheConstants.EXP, TimeUnit.MINUTES);
+
+
         return ResultFormat.success(token);
     }
 }

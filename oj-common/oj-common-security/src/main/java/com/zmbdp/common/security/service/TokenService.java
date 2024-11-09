@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class TokenService {
     @Autowired
     private RedisService redisService;
-
+    // 生成一个 token
     public String createToken(Long userId, String secret, Integer identity) {
         Map<String, Object> claims = new HashMap<>();
         String userKey = UUID.fastUUID().toString(); // 把 hutool 产生的 UUID 当作唯一主键

@@ -1,7 +1,7 @@
 package com.zmbdp.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.zmbdp.common.core.domain.ResultFormat;
+import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.security.service.TokenService;
@@ -28,7 +28,7 @@ public class SysUserServiceImpl implements ISysUserService {
     private String secret;
 
     @Override
-    public ResultFormat<String> login(String userAccount, String password) {
+    public Result<String> login(String userAccount, String password) {
         // 1. 先通过账号查询用户信息
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
         SysUser sysUser = sysUserMapper.selectOne(queryWrapper.
@@ -37,11 +37,11 @@ public class SysUserServiceImpl implements ISysUserService {
                         userAccount)); // 传入的 userAccount 字段
         if (sysUser == null || !BCryptUtils.matchPassword(password, sysUser.getPassword())) {
             // 表示用户不存在或者说密码错误，一起输出了，增加安全性
-            return ResultFormat.fail(ResultCode.FAILED_LOGIN);
+            return Result.fail(ResultCode.FAILED_LOGIN);
         }
-        // 表示全都对上了，生成一个 Token 返回给前端，后面携带这些信息，直接来验证
+        // 表示全都对上了，生成一个 Token 并且在 redis 中存储好，把 token 返回给前端，
+        // 后面携带这个 token，直接来验证
         String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue());
-
-        return ResultFormat.success(token);
+        return Result.success(token);
     }
 }

@@ -4,8 +4,8 @@ import cn.hutool.core.lang.UUID;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.JwtConstants;
 import com.zmbdp.common.redis.service.RedisService;
-import com.zmbdp.common.security.utils.JwtUtils;
-import com.zmbdp.common.security.domain.LoginUser;
+import com.zmbdp.common.core.utils.JwtUtils;
+import com.zmbdp.common.core.domain.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

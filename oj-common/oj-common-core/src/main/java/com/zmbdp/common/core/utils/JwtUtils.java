@@ -1,5 +1,6 @@
-package com.zmbdp.common.security.utils;
+package com.zmbdp.common.core.utils;
 
+import com.zmbdp.common.core.constants.JwtConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -32,5 +33,23 @@ public class JwtUtils {
                    .setSigningKey(secret)
                    .parseClaimsJws(token)
                    .getBody();
+    }
+
+    public static String getUserKey(Claims claims) {
+        Object value = claims.get(JwtConstants.LOGIN_USER_KEY);
+        return getStr(value);
+    }
+
+    public static String getUserId(Claims claims) {
+        // 先拿到 userId，然后判断是否为空，不为空就返回 toString
+        Object value = claims.get(JwtConstants.LOGIN_USER_ID);
+        return getStr(value);
+    }
+
+    private static String getStr(Object value) {
+        if (value == null) {
+            return "";
+        }
+        return value.toString();
     }
 }

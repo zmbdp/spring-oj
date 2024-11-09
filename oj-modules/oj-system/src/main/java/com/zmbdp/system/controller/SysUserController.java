@@ -1,6 +1,6 @@
 package com.zmbdp.system.controller;
 
-import com.zmbdp.common.core.domain.ResultFormat;
+import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.system.domain.LoginDTO;
 import com.zmbdp.system.domain.SysUserSaveDTO;
@@ -35,17 +35,17 @@ public class SysUserController {
     @ApiResponse(responseCode = "3001", description = "未授权")
     @ApiResponse(responseCode = "3103", description = "用户或密码错误")
     @ApiResponse(responseCode = "3105", description = "用户名或密码为输入")
-    public ResultFormat<String> login(@RequestBody(required = false) LoginDTO loginDTO) { // 加上 (required = false) 是因为怕前端出现问题了，传过来的 body 就算为空也能正确处理请求
+    public Result<String> login(@RequestBody(required = false) LoginDTO loginDTO) { // 加上 (required = false) 是因为怕前端出现问题了，传过来的 body 就算为空也能正确处理请求
         if (loginDTO == null) {
             // 直接整个都是空的话说明不是为输入了，是前端出了问题，参数根本没传
-            return ResultFormat.fail(ResultCode.ERROR);
+            return Result.fail(ResultCode.ERROR);
         }
 //        int a = 10 / 0;
         String userAccount = loginDTO.getUserAccount();
         String password = loginDTO.getPassword();
         if (StringUtils.isEmpty(userAccount) || StringUtils.isEmpty(password)) {
             // 如果说为空，那也是错的
-            return ResultFormat.fail(ResultCode.FAILED_MISSING_CREDENTIALS);
+            return Result.fail(ResultCode.FAILED_MISSING_CREDENTIALS);
         }
         return sysUserService.login(userAccount, password);
     }
@@ -56,7 +56,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "1000", description = "添加成功")
     @ApiResponse(responseCode = "2000", description = "服务繁忙请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户已存在")
-    public ResultFormat<Void> add(@RequestBody(required = false) SysUserSaveDTO sysUserSaveDTO) {
+    public Result<Void> add(@RequestBody(required = false) SysUserSaveDTO sysUserSaveDTO) {
         System.out.println("sysAdd");
         return null;
     }
@@ -71,7 +71,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "1000", description = "成功删除用户")
     @ApiResponse(responseCode = "2000", description = "服务繁忙，请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户不存在")
-    public ResultFormat<Void> delete(@PathVariable(required = false) Long userId) {
+    public Result<Void> delete(@PathVariable(required = false) Long userId) {
         if (userId == null) {
             // 这里就是未选择 userId，让管理员选择
         }
@@ -91,7 +91,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "1000", description = "成功获取用户信息")
     @ApiResponse(responseCode = "2000", description = "服务繁忙，请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户不存在")
-    public ResultFormat<SysUserVO> detail (
+    public Result<SysUserVO> detail (
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String sex
     ) {

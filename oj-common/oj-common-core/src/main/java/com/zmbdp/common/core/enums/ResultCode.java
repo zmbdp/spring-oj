@@ -26,6 +26,6 @@ public enum ResultCode {
     FAILED_USER_BLOCKED(3104, "您已被列入黑名单，请联系管理员"),
     FAILED_MISSING_CREDENTIALS(3105, "账号或密码未输入"),
     ;
-    private Integer code;
+    private int code;
     private String msg;
 }

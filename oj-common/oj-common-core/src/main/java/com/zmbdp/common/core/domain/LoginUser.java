@@ -1,4 +1,4 @@
-package com.zmbdp.common.security.domain;
+package com.zmbdp.common.core.domain;
 
 import lombok.Data;
 

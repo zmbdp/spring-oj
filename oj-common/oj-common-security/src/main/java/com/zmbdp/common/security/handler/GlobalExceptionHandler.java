@@ -1,4 +1,4 @@
-package com.zmbdp.common.security;
+package com.zmbdp.common.security.handler;
 
 import com.zmbdp.common.core.domain.ResultFormat;
 import com.zmbdp.common.core.enums.ResultCode;

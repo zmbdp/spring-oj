@@ -34,11 +34,12 @@
         <jjwt.version>0.9.1</jjwt.version>
         <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
         <hutool-all.version>5.8.22</hutool-all.version>
-        <oj-common-core.version>1.0-SNAPSHOT</oj-common-core.version>
         <springdoc-openapi.version>2.2.0</springdoc-openapi.version>
+        <oj-common-core.version>1.0-SNAPSHOT</oj-common-core.version>
         <oj-common-swagger.version>1.0-SNAPSHOT</oj-common-swagger.version>
         <oj-common-redis.version>1.0-SNAPSHOT</oj-common-redis.version>
         <oj-common-security.version>1.0-SNAPSHOT</oj-common-security.version>
+        <oj-system.version>1.0-SNAPSHOT</oj-system.version>
     </properties>
 
     <dependencies>

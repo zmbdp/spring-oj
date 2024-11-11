@@ -1,7 +1,7 @@
 package com.zmbdp.system.service;
 
 import com.zmbdp.common.core.domain.Result;
-import com.zmbdp.system.domain.SysUserSaveDTO;
+import com.zmbdp.system.domain.dto.SysUserSaveDTO;
 
 // service 类的接口类
 public interface ISysUserService {

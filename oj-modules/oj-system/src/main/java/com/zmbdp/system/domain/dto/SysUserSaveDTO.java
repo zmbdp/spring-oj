@@ -1,4 +1,4 @@
-package com.zmbdp.system.domain;
+package com.zmbdp.system.domain.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

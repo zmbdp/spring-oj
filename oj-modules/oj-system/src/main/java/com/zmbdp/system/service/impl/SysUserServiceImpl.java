@@ -8,7 +8,7 @@ import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.security.service.TokenService;
 import com.zmbdp.system.domain.SysUser;
-import com.zmbdp.system.domain.SysUserSaveDTO;
+import com.zmbdp.system.domain.dto.SysUserSaveDTO;
 import com.zmbdp.system.mapper.SysUserMapper;
 import com.zmbdp.system.service.ISysUserService;
 import com.zmbdp.system.utils.BCryptUtils;

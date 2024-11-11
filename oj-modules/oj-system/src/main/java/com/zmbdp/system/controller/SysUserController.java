@@ -1,11 +1,10 @@
 package com.zmbdp.system.controller;
 
-import com.zmbdp.common.core.controller.BaseService;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.enums.ResultCode;
-import com.zmbdp.system.domain.LoginDTO;
-import com.zmbdp.system.domain.SysUserSaveDTO;
-import com.zmbdp.system.domain.SysUserVO;
+import com.zmbdp.system.domain.dto.LoginDTO;
+import com.zmbdp.system.domain.dto.SysUserSaveDTO;
+import com.zmbdp.system.domain.vo.SysUserVO;
 import com.zmbdp.system.service.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

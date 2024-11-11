@@ -1,4 +1,4 @@
-package com.zmbdp.system.domain;
+package com.zmbdp.system.domain.dto;
 
 import lombok.Data;
 

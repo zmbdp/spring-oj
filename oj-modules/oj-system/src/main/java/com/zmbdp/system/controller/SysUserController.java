@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,18 +36,9 @@ public class SysUserController {
     @ApiResponse(responseCode = "3001", description = "未授权")
     @ApiResponse(responseCode = "3103", description = "用户或密码错误")
     @ApiResponse(responseCode = "3105", description = "用户名或密码为输入")
-    public Result<String> login(@RequestBody(required = false) LoginDTO loginDTO) { // 加上 (required = false) 是因为怕前端出现问题了，传过来的 body 就算为空也能正确处理请求
-        if (loginDTO == null) {
-            // 直接整个都是空的话说明不是为输入了，是前端出了问题，参数根本没传
-            return Result.fail(ResultCode.ERROR);
-        }
-//        int a = 10 / 0;
+    public Result<String> login(@RequestBody(required = false) @Validated LoginDTO loginDTO) {
         String userAccount = loginDTO.getUserAccount();
         String password = loginDTO.getPassword();
-        if (StringUtils.isEmpty(userAccount) || StringUtils.isEmpty(password)) {
-            // 如果说为空，那也是错的
-            return Result.fail(ResultCode.FAILED_MISSING_CREDENTIALS);
-        }
         return sysUserService.login(userAccount, password);
     }
 
@@ -56,13 +48,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "1000", description = "添加成功")
     @ApiResponse(responseCode = "2000", description = "服务繁忙请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户已存在")
-    public Result<Void> add(@RequestBody(required = false) SysUserSaveDTO sysUserSaveDTO) {
-        if (sysUserSaveDTO == null ||
-                sysUserSaveDTO.getUserAccount() == null || sysUserSaveDTO.getUserAccount().isEmpty() ||
-                sysUserSaveDTO.getPassword() == null || sysUserSaveDTO.getPassword().isEmpty()) {
-            return Result.fail(ResultCode.FAILED_MISSING_CREDENTIALS);
-        }
-        // 没有参数问题再继续往后执行
+    public Result<Void> add(@RequestBody(required = false) @Validated SysUserSaveDTO sysUserSaveDTO) {
         return sysUserService.add(sysUserSaveDTO);
     }
 

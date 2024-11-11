@@ -24,7 +24,6 @@ public enum ResultCode {
     FAILED_USER_NOT_EXISTS(3102, "账号不存在，请先进行注册"),
     FAILED_LOGIN(3103, "账号或密码错误，请重新输入"),
     FAILED_USER_BANNED(3104, "您已被列入黑名单，请联系管理员"),
-    FAILED_MISSING_CREDENTIALS(3105, "账号或密码未输入"),
     ;
     private int code;
     private String msg;

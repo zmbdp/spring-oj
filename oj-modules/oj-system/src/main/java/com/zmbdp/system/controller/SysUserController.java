@@ -1,5 +1,6 @@
 package com.zmbdp.system.controller;
 
+import com.zmbdp.common.core.controller.BaseService;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.system.domain.LoginDTO;
@@ -57,8 +58,13 @@ public class SysUserController {
     @ApiResponse(responseCode = "2000", description = "服务繁忙请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户已存在")
     public Result<Void> add(@RequestBody(required = false) SysUserSaveDTO sysUserSaveDTO) {
-        System.out.println("sysAdd");
-        return null;
+        if (sysUserSaveDTO == null ||
+                sysUserSaveDTO.getUserAccount() == null || sysUserSaveDTO.getUserAccount().isEmpty() ||
+                sysUserSaveDTO.getPassword() == null || sysUserSaveDTO.getPassword().isEmpty()) {
+            return Result.fail(ResultCode.FAILED_MISSING_CREDENTIALS);
+        }
+        // 没有参数问题再继续往后执行
+        return sysUserService.add(sysUserSaveDTO);
     }
 
     // 删除用户接口

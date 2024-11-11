@@ -55,6 +55,16 @@ public class RedisService {
     }
 
     /**
+     * 查看 key 的过期时间
+     * @param key 键
+     * @param unit 指定返回的时间单位，时分秒这种
+     * @return 剩余的过期时间
+     */
+    public Long getExpire(final String key, final TimeUnit unit) {
+        return redisTemplate.getExpire(key, unit);
+    }
+
+    /**
      * 删除单个对象
      *
      * @param key 键

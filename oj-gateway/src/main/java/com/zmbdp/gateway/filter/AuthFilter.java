@@ -50,6 +50,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
     @Autowired
     private RedisService redisService;
 
+    // 继承 GlobalFilter 接口，要执行的过滤器方法
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -79,6 +80,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         }
 
         String userKey = JwtUtils.getUserKey(claims); // 获取 jwt 中的 key
+        // 然后去 redis 里面找，没有就返回 false
         boolean isLogin = redisService.hasKey(getTokenKey(userKey));
         if (!isLogin) {
             return unauthorizedResponse(exchange, "登录状态已过期");
@@ -178,6 +180,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         return response.writeWith(Mono.just(dataBuffer));
     }
 
+    // 继承 Ordered 接口，定义过滤器的优先级
     @Override
     public int getOrder() {
         return -200; // 值越小，越先被执行

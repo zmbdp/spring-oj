@@ -1,2 +1,4 @@
 com.zmbdp.common.security.handler.GlobalExceptionHandler
 com.zmbdp.common.security.service.TokenService
+com.zmbdp.common.security.interceptor.TokenInterceptor
+com.zmbdp.common.security.config.WebMvcConfig

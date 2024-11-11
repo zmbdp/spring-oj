@@ -1,11 +1,14 @@
 package com.zmbdp.system.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.zmbdp.common.core.controller.BaseService;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.security.service.TokenService;
 import com.zmbdp.system.domain.SysUser;
+import com.zmbdp.system.domain.SysUserSaveDTO;
 import com.zmbdp.system.mapper.SysUserMapper;
 import com.zmbdp.system.service.ISysUserService;
 import com.zmbdp.system.utils.BCryptUtils;
@@ -14,10 +17,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 // service 类的实现类
 @Service
 @RefreshScope // 加上这个注解就算改变 nacos 上 secret 这里也能获取到新的 secret
-public class SysUserServiceImpl implements ISysUserService {
+public class SysUserServiceImpl extends BaseService implements ISysUserService {
     @Autowired
     private SysUserMapper sysUserMapper;
 
@@ -43,5 +48,30 @@ public class SysUserServiceImpl implements ISysUserService {
         // 后面携带这个 token，直接来验证
         String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue());
         return Result.success(token);
+    }
+
+    /**
+     * 在这里写添加管理员的 service
+     * @param sysUserSaveDTO 需要添加的数据对象
+     * @return 成功返回 success，失败返回 fail
+     */
+    @Override
+    public Result<Void> add(SysUserSaveDTO sysUserSaveDTO) {
+        SysUser sysUser = new SysUser();
+        // 先查一遍看看有没有
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        List<SysUser> selectUsers = sysUserMapper.selectList(queryWrapper.
+                eq(SysUser::getUserAccount, sysUserSaveDTO.getUserAccount()));
+        // isNotEmpty -> 不为空返回 true，说明有数据
+        if (CollectionUtil.isNotEmpty(selectUsers)) {
+            // 说明找到了，直接返回存在该数据就行了
+            return Result.fail(ResultCode.ALED_USER_EXISTS);
+        }
+        String password = BCryptUtils.encryptPassword(sysUserSaveDTO.getPassword());
+        // 然后再把密码给加密好放到 user 对象里面
+        sysUser.setUserAccount(sysUserSaveDTO.getUserAccount());
+        sysUser.setPassword(password);
+        // 再添加到数据库中
+        return toResult(sysUserMapper.insert(sysUser));
     }
 }

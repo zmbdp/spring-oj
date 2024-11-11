@@ -19,13 +19,6 @@
 
     <dependencies>
 
-        <!-- MyBatis-Plus Spring Boot 3 Starter -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-            <version>${mybatis-plus.version}</version>
-        </dependency>
-
         <!-- MySQL Connector -->
         <dependency>
             <groupId>com.mysql</groupId>

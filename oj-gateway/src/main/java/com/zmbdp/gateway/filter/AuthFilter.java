@@ -155,7 +155,7 @@ public class AuthFilter implements GlobalFilter, Ordered {
         // HttpConstants.AUTHENTICATION 是请求头当中的一个身份认证的凭据
         String token = request.getHeaders().getFirst(HttpConstants.AUTHENTICATION);
         // 如果前端设置了令牌前缀，则裁剪掉前缀
-        // HttpConstants.PREFIX 就是前端设置的令牌前缀
+        // HttpConstants.PREFIX 就是前端设置的令牌前缀，如果说包含 bearer 的话，就把前缀给删掉
         if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
             token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
         }

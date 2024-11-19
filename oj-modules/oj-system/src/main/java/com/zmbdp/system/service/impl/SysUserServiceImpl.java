@@ -3,7 +3,9 @@ package com.zmbdp.system.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zmbdp.common.core.controller.BaseService;
+import com.zmbdp.common.core.domain.LoginUser;
 import com.zmbdp.common.core.domain.Result;
+import com.zmbdp.common.core.domain.vo.LoginUserVO;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.security.service.TokenService;
@@ -12,6 +14,7 @@ import com.zmbdp.system.domain.dto.SysUserSaveDTO;
 import com.zmbdp.system.mapper.SysUserMapper;
 import com.zmbdp.system.service.ISysUserService;
 import com.zmbdp.system.utils.BCryptUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -37,7 +40,7 @@ public class SysUserServiceImpl extends BaseService implements ISysUserService {
         // 1. 先通过账号查询用户信息
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
         SysUser sysUser = sysUserMapper.selectOne(queryWrapper.
-                select(SysUser::getUserId, SysUser::getPassword). // 只查询出这个账户的密码
+                select(SysUser::getUserId, SysUser::getPassword, SysUser::getNickName). // 只查询出这个账户的密码
                         eq(SysUser::getUserAccount, // 表示 数据库字段，这里实际上指向 SysUser 类中的 userAccount 属性，它映射到数据库的 user_account 字段。
                         userAccount)); // 传入的 userAccount 字段
         if (sysUser == null || !BCryptUtils.matchPassword(password, sysUser.getPassword())) {
@@ -46,12 +49,14 @@ public class SysUserServiceImpl extends BaseService implements ISysUserService {
         }
         // 表示全都对上了，生成一个 Token 并且在 redis 中存储好，把 token 返回给前端，
         // 后面携带这个 token，直接来验证
-        String token = tokenService.createToken(sysUser.getUserId(), secret, UserIdentity.ADMIN.getValue());
+        String token = tokenService.createToken(sysUser.getUserId(), sysUser.getNickName(),
+                secret, UserIdentity.ADMIN.getValue());
         return Result.success(token);
     }
 
     /**
      * 在这里写添加管理员的 service
+     *
      * @param sysUserSaveDTO 需要添加的数据对象
      * @return 成功返回 success，失败返回 fail
      */
@@ -73,5 +78,20 @@ public class SysUserServiceImpl extends BaseService implements ISysUserService {
         sysUser.setPassword(password);
         // 再添加到数据库中
         return toResult(sysUserMapper.insert(sysUser));
+    }
+
+    // 获取用户的信息
+    @Override
+    public Result<LoginUserVO> info(String token) {
+        if (StringUtils.isEmpty(token)) {
+            return Result.fail(ResultCode.ERROR);
+        }
+        LoginUser loginUser = tokenService.getLoginUser(token, secret);
+        if (loginUser == null) {
+            return Result.fail();
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        loginUserVO.setNickName(loginUser.getNickName());
+        return Result.success(loginUserVO);
     }
 }

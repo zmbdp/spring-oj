@@ -1,6 +1,9 @@
 package com.zmbdp.system.controller;
 
+import cn.hutool.core.util.StrUtil;
+import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.domain.Result;
+import com.zmbdp.common.core.domain.vo.LoginUserVO;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.system.domain.dto.LoginDTO;
 import com.zmbdp.system.domain.dto.SysUserSaveDTO;
@@ -52,6 +55,20 @@ public class SysUserController {
         return sysUserService.add(sysUserSaveDTO);
     }
 
+    // 接口地址: /system/sysUser/info
+    // 这是获取用户的昵称
+    @GetMapping("/info")
+    public Result<LoginUserVO> info(@RequestHeader(HttpConstants.AUTHENTICATION) String token) {
+        if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        if (StringUtils.isEmpty(token)) {
+            return Result.fail(ResultCode.ERROR);
+        }
+        return sysUserService.info(token);
+    }
+
+
     // 删除用户接口
     @DeleteMapping("/del/{userId}")
     @Operation(summary = "删除用户", description = "通过用户id删除用户")
@@ -82,7 +99,7 @@ public class SysUserController {
     @ApiResponse(responseCode = "1000", description = "成功获取用户信息")
     @ApiResponse(responseCode = "2000", description = "服务繁忙，请稍后重试")
     @ApiResponse(responseCode = "3101", description = "用户不存在")
-    public Result<SysUserVO> detail (
+    public Result<SysUserVO> detail(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String sex
     ) {

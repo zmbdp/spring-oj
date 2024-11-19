@@ -1,5 +1,7 @@
 package com.zmbdp.common.core.utils;
 
+import cn.hutool.core.util.StrUtil;
+import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.constants.JwtConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,6 +31,9 @@ public class JwtUtils {
      * @return 数据
      */
     public static Claims getTokenMsg(String token, String secret) {
+        if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
         return Jwts.parser()
                    .setSigningKey(secret)
                    .parseClaimsJws(token)

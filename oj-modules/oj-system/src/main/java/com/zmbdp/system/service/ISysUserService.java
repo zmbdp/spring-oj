@@ -8,7 +8,9 @@ import com.zmbdp.system.domain.dto.SysUserSaveDTO;
 public interface ISysUserService {
     Result<String> login(String userAccount, String password);
 
-    Result<Void> add(SysUserSaveDTO sysUserSaveDTO);
+    Result<Void> logout(String token);
 
     Result<LoginUserVO> info(String token);
+
+    Result<Void> add(SysUserSaveDTO sysUserSaveDTO);
 }

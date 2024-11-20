@@ -68,6 +68,19 @@ public class SysUserController {
         return sysUserService.info(token);
     }
 
+    // 管理员退出功能
+    @DeleteMapping("/logout")
+    public Result<Void> logout(@RequestHeader(HttpConstants.AUTHENTICATION) String token) {
+        if (StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StrUtil.EMPTY);
+        }
+        if (StringUtils.isEmpty(token)) {
+            return Result.fail(ResultCode.ERROR);
+        }
+        return sysUserService.logout(token);
+    }
+
+
 
     // 删除用户接口
     @DeleteMapping("/del/{userId}")
@@ -107,5 +120,4 @@ public class SysUserController {
         // 这里是查询操作的实现
         return null;
     }
-
 }

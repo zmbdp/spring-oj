@@ -81,4 +81,14 @@ public class TokenService {
         String redisKey = getRedisKey(userKey);
         return redisService.getCacheObject(redisKey, LoginUser.class);
     }
+
+    public boolean delLoginUser(String token, String secret) {
+        String userKey = getUserKey(token, secret);
+        if (userKey == null) {
+            return false;
+        }
+        // 然后再删除掉 redis 中的这个 key
+        String redisKey = getRedisKey(userKey);
+        return redisService.deleteObject(redisKey);
+    }
 }

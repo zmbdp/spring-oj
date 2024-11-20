@@ -94,4 +94,13 @@ public class SysUserServiceImpl extends BaseService implements ISysUserService {
         loginUserVO.setNickName(loginUser.getNickName());
         return Result.success(loginUserVO);
     }
+
+    // 退出登录逻辑的 service 代码
+    @Override
+    public Result<Void> logout(String token) {
+        if (StringUtils.isEmpty(token)) {
+            return Result.fail(ResultCode.ERROR);
+        }
+        return tokenService.delLoginUser(token, secret) ? Result.success() : Result.fail();
+    }
 }

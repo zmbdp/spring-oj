@@ -1,7 +1,7 @@
 package com.zmbdp.system.test.controller;
 
 import com.zmbdp.common.redis.service.RedisService;
-import com.zmbdp.system.domain.SysUser;
+import com.zmbdp.system.domain.sysuser.SysUser;
 import com.zmbdp.system.test.dto.ValidationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;

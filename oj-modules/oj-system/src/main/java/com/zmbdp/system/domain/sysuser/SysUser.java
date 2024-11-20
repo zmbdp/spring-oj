@@ -1,4 +1,4 @@
-package com.zmbdp.system.domain;
+package com.zmbdp.system.domain.sysuser;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

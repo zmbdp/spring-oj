@@ -1,4 +1,4 @@
-package com.zmbdp.common.core.controller;
+package com.zmbdp.common.core.service;
 
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.enums.ResultCode;

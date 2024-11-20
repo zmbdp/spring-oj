@@ -2,15 +2,15 @@ package com.zmbdp.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.zmbdp.common.core.controller.BaseService;
+import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.domain.LoginUser;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.vo.LoginUserVO;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.security.service.TokenService;
-import com.zmbdp.system.domain.SysUser;
-import com.zmbdp.system.domain.dto.SysUserSaveDTO;
+import com.zmbdp.system.domain.sysuser.SysUser;
+import com.zmbdp.system.domain.sysuser.dto.SysUserSaveDTO;
 import com.zmbdp.system.mapper.SysUserMapper;
 import com.zmbdp.system.service.ISysUserService;
 import com.zmbdp.system.utils.BCryptUtils;

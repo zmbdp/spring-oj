@@ -24,6 +24,6 @@ public class BaseService {
             return TableDataInfo.empty();
         }
 //        new PageInfo(questionVOList).getTotal();// 获取符合条件的数据总数
-        return TableDataInfo.success(list, (int) (new PageInfo(list).getTotal()));
+        return TableDataInfo.success(list, new PageInfo<>(list).getTotal());
     }
 }

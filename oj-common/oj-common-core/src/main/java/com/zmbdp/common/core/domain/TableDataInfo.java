@@ -38,23 +38,6 @@ public class TableDataInfo {
     public TableDataInfo() {
     }
 
-    public static TableDataInfo empty() {
-        TableDataInfo rspData = new TableDataInfo();
-        rspData.setCode(ResultCode.SUCCESS.getCode());
-        rspData.setRows(new ArrayList<>());
-        rspData.setMsg(ResultCode.SUCCESS.getMsg());
-        rspData.setTotal(0);
-        return rspData;
-    }
-    public static TableDataInfo success(List<?> list,int total) {
-        TableDataInfo rspData = new TableDataInfo();
-        rspData.setCode(ResultCode.SUCCESS.getCode());
-        rspData.setRows(list);
-        rspData.setMsg(ResultCode.SUCCESS.getMsg());
-        rspData.setTotal(total);
-        return rspData;
-    }
-
     /**
      * 分页
      *
@@ -64,5 +47,23 @@ public class TableDataInfo {
     public TableDataInfo(List<?> list, int total) {
         this.rows = list;
         this.total = total;
+    }
+
+    public static TableDataInfo empty() {
+        TableDataInfo rspData = new TableDataInfo();
+        rspData.setCode(ResultCode.SUCCESS.getCode());
+        rspData.setRows(new ArrayList<>());
+        rspData.setMsg(ResultCode.SUCCESS.getMsg());
+        rspData.setTotal(0);
+        return rspData;
+    }
+
+    public static TableDataInfo success(List<?> list, long total) {
+        TableDataInfo rspData = new TableDataInfo();
+        rspData.setCode(ResultCode.SUCCESS.getCode());
+        rspData.setRows(list);
+        rspData.setMsg(ResultCode.SUCCESS.getMsg());
+        rspData.setTotal(total);
+        return rspData;
     }
 }

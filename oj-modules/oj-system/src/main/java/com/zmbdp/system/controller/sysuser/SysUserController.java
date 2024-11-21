@@ -3,12 +3,12 @@ package com.zmbdp.system.controller.sysuser;
 import cn.hutool.core.util.StrUtil;
 import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.domain.Result;
-import com.zmbdp.common.core.domain.vo.LoginUserVO;
+import com.zmbdp.system.domain.sysuser.vo.LoginUserVO;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.system.domain.sysuser.dto.LoginDTO;
 import com.zmbdp.system.domain.sysuser.dto.SysUserSaveDTO;
 import com.zmbdp.system.domain.sysuser.vo.SysUserVO;
-import com.zmbdp.system.service.ISysUserService;
+import com.zmbdp.system.service.sysuser.ISysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -79,7 +79,6 @@ public class SysUserController {
         }
         return sysUserService.logout(token);
     }
-
 
 
     // 删除用户接口

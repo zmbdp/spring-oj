@@ -1,0 +1,3 @@
+com\zmbdp\common\redis\service\RedisService.class
+com\zmbdp\common\redis\config\RedisConfig.class
+com\zmbdp\common\redis\config\JsonRedisSerializer.class

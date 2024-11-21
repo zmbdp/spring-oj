@@ -1,0 +1,3 @@
+com\zmbdp\gateway\filter\AuthFilter.class
+com\zmbdp\gateway\OjGatewayApplication.class
+com\zmbdp\gateway\properties\IgnoreWhiteProperties.class

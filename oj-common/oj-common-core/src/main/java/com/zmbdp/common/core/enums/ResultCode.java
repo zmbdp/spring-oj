@@ -17,7 +17,7 @@ public enum ResultCode {
     FAILED_UNAUTHORIZED(3001, "未授权"),
     FAILED_PARAMS_VALIDATE(3002, "参数校验失败"),
     FAILED_NOT_EXISTS(3003, "资源不存在"),
-    FAILED_NOT_EXISTS_EXISTS(3004, "资源已存在"),
+    FAILED_ALREADY_EXISTS(3004, "资源已存在"),
 
     // 表示用户相关的操作
     ALED_USER_EXISTS(3101, "账号已存在，请重新输入"),

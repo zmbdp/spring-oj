@@ -46,6 +46,11 @@ public class Result<T> {
         return assembleResult(resultCode, null);
     }
 
+    public static <T> Result<T> fail(String msg) {
+        // 错误的话就不返回数据了嘛，直接返回错误信息就好了
+        return assembleResult(ResultCode.FAILED.getCode(), msg, null);
+    }
+
     private static <T> Result<T> assembleResult(ResultCode resultCode, T date) {
         Result<T> result = new Result<>();
         result.setCode(resultCode.getCode());

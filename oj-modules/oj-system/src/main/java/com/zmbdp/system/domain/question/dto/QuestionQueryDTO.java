@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class QueryQueryDTO extends PageQueryDTO {
+public class QuestionQueryDTO extends PageQueryDTO {
     private String title; // 标题
     private Integer difficulty; // 难度
 }

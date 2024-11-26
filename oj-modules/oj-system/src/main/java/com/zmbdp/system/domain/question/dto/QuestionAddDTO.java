@@ -1,8 +1,6 @@
 package com.zmbdp.system.domain.question.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -19,24 +17,31 @@ public class QuestionAddDTO {
      * @Future：日期是否为将来的日期。
      * @Past：日期是否为过去的日期。
      */
-    @NotNull(message = "标题不能为空")
+    @NotBlank(message = "标题不能为空")
     private String title; // 标题
+
     @Min(value = 1, message = "难度最小为简单")
     @Max(value = 3, message = "难度最大为困难")
     @NotNull(message = "难度不能为空")
     private Integer difficulty; // 难度
-    @Min(value = 0, message = "最少为0ms")
+
+    @Min(value = 0, message = "最少为0毫秒")
     @NotNull(message = "时间限制不能为空")
     private Long timeLimit; // 时间限制
-    @Min(value = 0, message = "最少为0mb")
+
+    @Min(value = 0, message = "最少为0字节")
     @NotNull(message = "空间限制不能为空")
     private Long spaceLimit; // 空间限制
-    @NotNull(message = "题目内容不能为空")
+
+    @NotBlank(message = "题目内容不能为空")
     private String content; // 题目内容
-    @NotNull(message = "题目用例不能为空")
+
+    @NotBlank(message = "题目用例不能为空")
     private String questionCase; // 题目用例
-    @NotNull(message = "题目用例不能为空")
+
+    @NotBlank(message = "题目用例不能为空")
     private String defaultCode; // 题目用例
-    @NotNull(message = "main函数不能为空")
+
+    @NotBlank(message = "main函数不能为空")
     private String mainFuc; // main 函数
 }

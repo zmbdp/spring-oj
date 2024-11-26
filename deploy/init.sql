@@ -75,8 +75,8 @@ drop table if exists tb_exam_question;
 create table tb_exam_question
 (
     exam_question_id bigint unsigned not null comment '竞赛题目关系id（主键）',
-    question_id      bigint unsigned not null comment '题目id（主键）',
-    exam_id          bigint unsigned not null comment '竞赛id（主键）',
+    question_id      bigint unsigned not null comment '题目id',
+    exam_id          bigint unsigned not null comment '竞赛id',
     question_order   int      not null comment '题目顺序',
     creat_by         bigint unsigned not null comment '创建人',
     create_time      datetime not null comment '创建时间',

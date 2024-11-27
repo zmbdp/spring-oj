@@ -1,9 +1,11 @@
 package com.zmbdp.system.domain.sysuser.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class LoginDTO {
     /**
      * @NotNull：值不能为null。

@@ -2,9 +2,11 @@ package com.zmbdp.system.domain.question.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class QuestionDetailVO {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long questionId; // 题目 id

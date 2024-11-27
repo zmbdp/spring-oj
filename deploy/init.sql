@@ -78,7 +78,7 @@ create table tb_exam_question
     question_id      bigint unsigned not null comment '题目id',
     exam_id          bigint unsigned not null comment '竞赛id',
     question_order   int      not null comment '题目顺序',
-    creat_by         bigint unsigned not null comment '创建人',
+    create_by         bigint unsigned not null comment '创建人',
     create_time      datetime not null comment '创建时间',
     update_by        bigint unsigned comment '更新人',
     update_time      datetime comment '更新时间',

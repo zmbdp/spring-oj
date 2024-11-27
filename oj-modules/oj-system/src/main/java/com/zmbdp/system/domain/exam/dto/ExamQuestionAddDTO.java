@@ -1,13 +1,15 @@
-package com.zmbdp.system.domain.sysuser.dto;
+package com.zmbdp.system.domain.exam.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.LinkedHashSet;
+
 @Getter
 @Setter
-public class SysUserSaveDTO {
+public class ExamQuestionAddDTO {
     /**
      * @NotNull：值不能为null。
      * @NotEmpty：字符串、集合或数组的值不能为空，即长度必须大于0。
@@ -20,10 +22,8 @@ public class SysUserSaveDTO {
      * @Future：日期是否为将来的日期。
      * @Past：日期是否为过去的日期。
      */
-    @Schema(description = "管理员用户名")
-    @NotBlank(message = "用户名不能为空")
-    private String userAccount;
-    @Schema(description = "管理员密码")
-    @NotBlank(message = "用户密码不能为空")
-    private String password;
+    @NotNull(message = "竞赛id不能为空")
+    private Long examId; // 竞赛id
+    @NotEmpty(message = "题目id不能为空")
+    private LinkedHashSet<Long> questionIdSet; // 题目id的集合
 }

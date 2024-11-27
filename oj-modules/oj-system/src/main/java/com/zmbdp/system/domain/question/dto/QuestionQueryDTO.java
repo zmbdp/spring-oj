@@ -3,11 +3,11 @@ package com.zmbdp.system.domain.question.dto;
 import com.zmbdp.common.core.domain.PageQueryDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 public class QuestionQueryDTO extends PageQueryDTO {
     @NotBlank(message = "标题不能为空")
     private String title; // 标题

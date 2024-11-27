@@ -4,6 +4,7 @@ import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.system.domain.exam.dto.ExamAddDTO;
 import com.zmbdp.system.domain.exam.dto.ExamQueryDTO;
+import com.zmbdp.system.domain.exam.dto.ExamQuestionAddDTO;
 import com.zmbdp.system.service.exam.IExamService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,15 @@ public class ExamController {
         return examService.list(examQueryDTO);
     }
 
-    // 新增题目
+    // 新增没有题目的竞赛
     @PostMapping("/add")
     public Result<Void> add(@RequestBody @Validated ExamAddDTO examAddDTO) {
         return examService.add(examAddDTO);
+    }
+
+    // 新增有题目的竞赛
+    @PostMapping("/question/add")
+    public Result<Void> questionAdd(@RequestBody @Validated ExamQuestionAddDTO examQuestionAddDTO) {
+        return examService.questionAdd(examQuestionAddDTO);
     }
 }

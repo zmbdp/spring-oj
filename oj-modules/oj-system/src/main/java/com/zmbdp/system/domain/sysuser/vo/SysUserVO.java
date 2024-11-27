@@ -1,9 +1,11 @@
 package com.zmbdp.system.domain.sysuser.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class SysUserVO {
     @Schema(description = "管理员昵称")
     private String userAccount;

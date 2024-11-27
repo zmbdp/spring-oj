@@ -69,9 +69,6 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
             // 说明资源不存在
             return Result.fail(ResultCode.FAILED_NOT_EXISTS);
         }
-        if (questionEditDTO.getQuestionId() != null && questionEditDTO.getQuestionId() instanceof Long) {
-            System.err.println("是Integer");
-        }
         // 再看看有没有重复的
         // 如果说查到了有，并且这两个 id 不相等，就返回已存在
         List<Question> questions = questionMapper.selectList(new LambdaQueryWrapper<Question>()

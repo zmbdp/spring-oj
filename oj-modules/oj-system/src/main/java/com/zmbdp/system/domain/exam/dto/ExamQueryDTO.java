@@ -1,11 +1,11 @@
 package com.zmbdp.system.domain.exam.dto;
 
 import com.zmbdp.common.core.domain.PageQueryDTO;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 public class ExamQueryDTO extends PageQueryDTO {
     private String title; // 竞赛标题
     private String startTime; // 竞赛开始时间

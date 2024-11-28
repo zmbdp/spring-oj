@@ -4,14 +4,14 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zmbdp.common.core.domain.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @TableName("tb_exam")
+@EqualsAndHashCode(callSuper = true)
 public class Exam extends BaseEntity {
     @TableId(type = IdType.ASSIGN_ID)
     private Long examId; // 竞赛 id

@@ -1,10 +1,8 @@
 package com.zmbdp.system.domain.sysuser.vo;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class LoginUserVO {
     private String nickName;
 }

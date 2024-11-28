@@ -2,13 +2,11 @@ package com.zmbdp.system.domain.exam.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.LinkedHashSet;
 
-@Getter
-@Setter
+@Data
 public class ExamQuestionAddDTO {
     /**
      * @NotNull：值不能为null。

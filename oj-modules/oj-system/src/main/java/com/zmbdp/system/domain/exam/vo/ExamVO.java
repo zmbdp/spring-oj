@@ -1,13 +1,11 @@
 package com.zmbdp.system.domain.exam.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 public class ExamVO {
     private String title; // 竞赛标题
 

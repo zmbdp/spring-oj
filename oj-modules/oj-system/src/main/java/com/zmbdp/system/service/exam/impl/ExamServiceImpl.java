@@ -13,7 +13,9 @@ import com.zmbdp.system.domain.exam.ExamQuestion;
 import com.zmbdp.system.domain.exam.dto.ExamAddDTO;
 import com.zmbdp.system.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.system.domain.exam.dto.ExamQuestionAddDTO;
+import com.zmbdp.system.domain.exam.vo.ExamDetailVO;
 import com.zmbdp.system.domain.question.Question;
+import com.zmbdp.system.domain.question.vo.QuestionVO;
 import com.zmbdp.system.mapper.exam.ExamMapper;
 import com.zmbdp.system.mapper.exam.ExamQuestionMapper;
 import com.zmbdp.system.mapper.question.QuestionMapper;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +48,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
     }
 
     @Override
-    public Result<Void> add(ExamAddDTO examAddDTO) {
+    public Result<String> add(ExamAddDTO examAddDTO) {
         // 新增无题目的竞赛 service 层
         // 先查一下是否存在，因为竞赛名称不能重复
         List<Exam> examList = examMapper.selectList(new LambdaQueryWrapper<Exam>()
@@ -62,14 +65,16 @@ public class ExamServiceImpl extends BaseService implements IExamService {
             // 竞赛开始时间不能晚于竞赛结束时间
             return Result.fail(ResultCode.EXAM_START_TIME_AFTER_END_TIME);
         }
-        return toResult(examMapper.insert(BeanUtil.copyProperties(examAddDTO, Exam.class)));
+        Exam exam = new Exam();
+        BeanUtil.copyProperties(examAddDTO, exam);
+        return examMapper.insert(exam) > 0 ? Result.success(exam.getExamId().toString()) : Result.fail(ResultCode.ERROR);
     }
 
     @Override
     public Result<Void> questionAdd(ExamQuestionAddDTO examQuestionAddDTO) {
         // 新增竞赛里面的题目 service 层
         // 先查一下 竞赛 看看存不存在
-        Exam exam = getExam(examQuestionAddDTO);
+        Exam exam = getExam(examQuestionAddDTO.getExamId());
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
@@ -86,6 +91,35 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         }
 
         return toResult(saveExamQuestion(questionIdSet, exam));
+    }
+
+    @Override
+    public Result<ExamDetailVO> detail(Long examId) {
+        // 获取竞赛信息的 service 层
+        // 先获取到竞赛的 id
+        ExamDetailVO examDetailVO = new ExamDetailVO();
+        Exam exam = getExam(examId);
+        if (exam == null) {
+            return Result.fail(ResultCode.EXAM_NOT_EXISTS);
+        }
+        BeanUtil.copyProperties(exam, examDetailVO);
+        List<ExamQuestion> examQuestionList = examQuestionMapper.selectList(new LambdaQueryWrapper<ExamQuestion>()
+                .select(ExamQuestion::getQuestionId)
+                .eq(ExamQuestion::getExamId, examId)
+                .orderByAsc(ExamQuestion::getQuestionOrder));
+        if (CollectionUtil.isEmpty(examQuestionList)) {
+            return Result.success(examDetailVO);
+        }
+        List<Long> questionIdList = examQuestionList.stream().map(ExamQuestion::getQuestionId).toList();
+        // select * from tb_question question_id in(1, 2, 3)
+        List<Question> questionList = questionMapper.selectList(new LambdaQueryWrapper<Question>()
+                .select(Question::getQuestionId, Question::getTitle, Question::getDifficulty)
+                .in(Question::getQuestionId, questionIdList));
+        // 先把所有的题目放到 list 里面
+        List<QuestionVO> questionVOList = BeanUtil.copyToList(questionList, QuestionVO.class);
+        // 然后再把这个 list 放到返回的 VO 里面去
+        examDetailVO.setExamQuestionList(questionVOList);
+        return Result.success(examDetailVO);
     }
 
     /**
@@ -111,7 +145,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         return true;
     }
 
-    private Exam getExam(ExamQuestionAddDTO examQuestionAddDTO) {
-        return examMapper.selectById(examQuestionAddDTO.getExamId());
+    private Exam getExam(Long examId) {
+        return examMapper.selectById(examId);
     }
 }

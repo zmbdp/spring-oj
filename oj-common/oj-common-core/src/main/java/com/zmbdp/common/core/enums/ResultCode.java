@@ -30,7 +30,11 @@ public enum ResultCode {
     EXAM_START_TIME_BEFORE_CURRENT_TIME(3201, "竞赛开始时间不能早于当前时间"),
     EXAM_START_TIME_AFTER_END_TIME(3202, "竞赛开始时间不能晚于竞赛结束时间"),
     EXAM_NOT_EXISTS(3203, "竞赛不存在"),
-    EXAM_QUESTION_NOT_EXISTS(3204, "为竞赛新增的题目不存在"),
+    EXAM_QUESTION_NOT_EXISTS(3204, "操作的题目不存在"),
+    EXAM_STARTED(3205, "禁止操作已开始的竞赛"),
+    EXAM_NOT_HAS_QUESTION(3206, "禁止发布无题目的竞赛"),
+    EXAM_IS_FINISH(3207, "禁止操作已结束的比赛"),
+    EXAM_IS_PUBLISH(3208, "禁止操作已发布的比赛"),
     ;
     private int code;
     private String msg;

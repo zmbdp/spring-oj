@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
+import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.common.core.enums.ResultCode;
@@ -11,11 +12,13 @@ import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.system.domain.exam.Exam;
 import com.zmbdp.system.domain.exam.ExamQuestion;
 import com.zmbdp.system.domain.exam.dto.ExamAddDTO;
+import com.zmbdp.system.domain.exam.dto.ExamEditDTO;
 import com.zmbdp.system.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.system.domain.exam.dto.ExamQuestionAddDTO;
 import com.zmbdp.system.domain.exam.vo.ExamDetailVO;
 import com.zmbdp.system.domain.question.Question;
 import com.zmbdp.system.domain.question.vo.QuestionVO;
+import com.zmbdp.system.manager.ExamCacheManager;
 import com.zmbdp.system.mapper.exam.ExamMapper;
 import com.zmbdp.system.mapper.exam.ExamQuestionMapper;
 import com.zmbdp.system.mapper.question.QuestionMapper;
@@ -24,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -40,39 +42,47 @@ public class ExamServiceImpl extends BaseService implements IExamService {
     @Autowired
     private ExamQuestionMapper examQuestionMapper;
 
+    @Autowired
+    private ExamCacheManager examCacheManager;
+
+    /**
+     * 获取题目列表 service 层
+     *
+     * @param examQueryDTO 符合这些要求的题目
+     * @return 这一页的数据
+     */
     @Override
     public TableDataInfo list(ExamQueryDTO examQueryDTO) {
-        // 获取题目列表 service 层
         PageHelper.startPage(examQueryDTO.getPageNum(), examQueryDTO.getPageSize()); // 设置页面也每页记录数
         return getTableDataInfo(examMapper.selectExamList(examQueryDTO));
     }
 
+    /**
+     * 新增无题目的竞赛 service 层
+     *
+     * @param examAddDTO 新增竞赛的基本信息
+     * @return 新增的这个竞赛的 id
+     */
     @Override
     public Result<String> add(ExamAddDTO examAddDTO) {
-        // 新增无题目的竞赛 service 层
         // 先查一下是否存在，因为竞赛名称不能重复
-        List<Exam> examList = examMapper.selectList(new LambdaQueryWrapper<Exam>()
-                .eq(Exam::getTitle, examAddDTO.getTitle()));
-        if (CollectionUtil.isNotEmpty(examList)) {
-            return Result.fail(ResultCode.FAILED_ALREADY_EXISTS);
-        }
-        // 判断时间的问题
-        if (examAddDTO.getStartTime().isBefore(LocalDateTime.now())) {
-            // 竞赛开始时间不能早于当前时间
-            return Result.fail(ResultCode.EXAM_START_TIME_BEFORE_CURRENT_TIME);
-        }
-        if (examAddDTO.getStartTime().isAfter(examAddDTO.getEndTime())) {
-            // 竞赛开始时间不能晚于竞赛结束时间
-            return Result.fail(ResultCode.EXAM_START_TIME_AFTER_END_TIME);
+        Result<String> saveParams = checkExamSaveParams(examAddDTO, null);
+        if (saveParams != null) {
+            return saveParams;
         }
         Exam exam = new Exam();
         BeanUtil.copyProperties(examAddDTO, exam);
         return examMapper.insert(exam) > 0 ? Result.success(exam.getExamId().toString()) : Result.fail(ResultCode.ERROR);
     }
 
+    /**
+     * 新增竞赛里面的题目 service 层
+     *
+     * @param examQuestionAddDTO 新增竞赛的题目
+     * @return 添加是否成功
+     */
     @Override
     public Result<Void> questionAdd(ExamQuestionAddDTO examQuestionAddDTO) {
-        // 新增竞赛里面的题目 service 层
         // 先查一下 竞赛 看看存不存在
         Exam exam = getExam(examQuestionAddDTO.getExamId());
         if (exam == null) {
@@ -84,6 +94,14 @@ public class ExamServiceImpl extends BaseService implements IExamService {
             // 先拿到这些数据，如果说没有的话也行
             return null;
         }
+        // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
+        if (checkExam(exam)) {
+            return Result.fail(ResultCode.EXAM_STARTED);
+        }
+        // 如果已经发布就不允许添加
+        if (Constants.TRUE.equals(exam.getStatus())) {
+            return Result.fail(ResultCode.EXAM_IS_PUBLISH);
+        }
         // 看看这些题目存不存在
         List<Question> questionList = questionMapper.selectBatchIds(questionIdSet);
         if (CollectionUtil.isEmpty(questionList) || questionList.size() < examQuestionAddDTO.getQuestionIdSet().size()) {
@@ -93,15 +111,53 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         return toResult(saveExamQuestion(questionIdSet, exam));
     }
 
+    /**
+     * 删除竞赛中的题目 service 层
+     *
+     * @param examId     竞赛 id
+     * @param questionId 需要删除的题目 id
+     * @return 成功返回 success 失败返回 fail
+     */
     @Override
-    public Result<ExamDetailVO> detail(Long examId) {
-        // 获取竞赛信息的 service 层
-        // 先获取到竞赛的 id
-        ExamDetailVO examDetailVO = new ExamDetailVO();
+    public Result<Void> questionDelete(Long examId, Long questionId) {
+        // 先看看这个竞赛的数据存不存在
         Exam exam = getExam(examId);
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
+        // 再判断题目是否存在
+        // 然后再查询一下看看这些 题目 是否存在
+        if (questionMapper.selectById(questionId) == null) {
+            return Result.fail(ResultCode.EXAM_QUESTION_NOT_EXISTS);
+        }
+        // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
+        if (checkExam(exam)) {
+            return Result.fail(ResultCode.EXAM_STARTED);
+        }
+        if (Constants.TRUE.equals(exam.getStatus())) {
+            return Result.fail(ResultCode.EXAM_IS_PUBLISH);
+        }
+        return toResult(
+                examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
+                        .eq(ExamQuestion::getExamId, examId)
+                        .eq(ExamQuestion::getQuestionId, questionId)
+                ));
+    }
+
+    /**
+     * 获取竞赛信息的 service 层
+     *
+     * @param examId 竞赛 id
+     * @return 这个竞赛的信息
+     */
+    @Override
+    public Result<ExamDetailVO> detail(Long examId) {
+        // 先获取到竞赛的 id
+        Exam exam = getExam(examId);
+        if (exam == null) {
+            return Result.fail(ResultCode.EXAM_NOT_EXISTS);
+        }
+        ExamDetailVO examDetailVO = new ExamDetailVO();
         BeanUtil.copyProperties(exam, examDetailVO);
         List<ExamQuestion> examQuestionList = examQuestionMapper.selectList(new LambdaQueryWrapper<ExamQuestion>()
                 .select(ExamQuestion::getQuestionId)
@@ -120,6 +176,153 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         // 然后再把这个 list 放到返回的 VO 里面去
         examDetailVO.setExamQuestionList(questionVOList);
         return Result.success(examDetailVO);
+    }
+
+    /**
+     * 编辑竞赛 service 层
+     *
+     * @param examEditDTO 修改之后的竞赛
+     * @return 返回是否成功
+     */
+    @Override
+    public Result<String> edit(ExamEditDTO examEditDTO) {
+        // 先看看是否存在这个数据
+        Exam exam = getExam(examEditDTO.getExamId());
+        if (exam == null) {
+            return Result.fail(ResultCode.EXAM_NOT_EXISTS);
+        }
+        // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
+        if (checkExam(exam)) {
+            return Result.fail(ResultCode.EXAM_STARTED);
+        }
+        if (Constants.TRUE.equals(exam.getStatus())) {
+            return Result.fail(ResultCode.EXAM_IS_PUBLISH);
+        }
+        // 判断一些参数，比如说标题，开始时间和结束时间
+        Result<String> saveParams = checkExamSaveParams(examEditDTO, examEditDTO.getExamId());
+        if (saveParams != null) {
+            return saveParams;
+        }
+        // 然后再将 examEditDTO copy 到 exam 里
+        BeanUtil.copyProperties(examEditDTO, exam);
+        // 修改数据库中的数据
+        return examMapper.updateById(exam) > 0 ? Result.success() : Result.fail(ResultCode.ERROR);
+    }
+
+    /**
+     * 删除竞赛的 service 层
+     *
+     * @param examId 需要删除的题目的 id
+     * @return 是否删除成功
+     */
+    @Override
+    public Result<Void> delete(Long examId) {
+        Exam exam = getExam(examId);
+        if (exam == null) {
+            return Result.fail(ResultCode.EXAM_NOT_EXISTS);
+        }
+        if (Constants.TRUE.equals(exam.getStatus())) {
+            return Result.fail(ResultCode.EXAM_IS_PUBLISH);
+        }
+        if (checkExam(exam)) {
+            return Result.fail(ResultCode.EXAM_STARTED);
+        }
+        return toResult(
+                examMapper.deleteById(exam) +
+                        examQuestionMapper.delete(new LambdaQueryWrapper<ExamQuestion>()
+                                .eq(ExamQuestion::getExamId, examId))
+        );
+    }
+
+    /**
+     * 竞赛发布功能 service 层
+     *
+     * @param examId 需要发布的竞赛 id
+     * @return 是否成功
+     */
+    @Override
+    public Result<Void> publish(Long examId) {
+        Exam exam = getExam(examId);
+        if (exam == null) {
+            return Result.fail(ResultCode.EXAM_NOT_EXISTS);
+        }
+        Long count = examQuestionMapper
+                .selectCount(new LambdaQueryWrapper<ExamQuestion>()
+                        .eq(ExamQuestion::getExamId, examId));
+        if (count == null || count <= 0) {
+            // 说明没有题目，不允许发布
+            return Result.fail(ResultCode.EXAM_NOT_HAS_QUESTION);
+        }
+        exam.setStatus(Constants.TRUE);
+        return toResult(examMapper.updateById(exam));
+    }
+
+    /**
+     * 撤销发布 service 层
+     *
+     * @param examId
+     * @return
+     */
+    @Override
+    public Result<Void> cancelPublish(Long examId) {
+        Exam exam = getExam(examId);
+        if (exam == null) {
+            return Result.fail(ResultCode.EXAM_NOT_EXISTS);
+        }
+        // 看看是否开始
+        if (checkExam(exam)) {
+            return Result.fail(ResultCode.EXAM_STARTED);
+        }
+        // 看看是否结束
+        if (exam.getEndTime().isBefore(LocalDateTime.now())) {
+            return Result.fail(ResultCode.EXAM_IS_FINISH);
+        }
+        exam.setStatus(Constants.FALSE);
+        examCacheManager.deleteCache(examId);
+        return toResult(examMapper.updateById(exam));
+    }
+
+    /**
+     * 参数校验
+     *
+     * @param examSaveDTO 竞赛的信息
+     * @param examId      当前竞赛的 id
+     * @return 是否正确
+     */
+    private Result<String> checkExamSaveParams(ExamAddDTO examSaveDTO, Long examId) {
+        // 判断一些参数是否合理
+        // 查标题是否存在一样的
+        List<Exam> examList = examMapper
+                .selectList(new LambdaQueryWrapper<Exam>()
+                        .eq(Exam::getTitle, examSaveDTO.getTitle())
+                        .ne(examId != null, Exam::getExamId, examId)
+                );
+        if (CollectionUtil.isNotEmpty(examList)) {
+            return Result.fail(ResultCode.FAILED_ALREADY_EXISTS);
+        }
+        // 判断时间的问题
+        if (examSaveDTO.getStartTime().isBefore(LocalDateTime.now())) {
+            // 竞赛开始时间不能早于当前时间
+            return Result.fail(ResultCode.EXAM_START_TIME_BEFORE_CURRENT_TIME);
+        }
+        if (examSaveDTO.getStartTime().isAfter(examSaveDTO.getEndTime())) {
+            // 竞赛开始时间不能晚于竞赛结束时间
+            return Result.fail(ResultCode.EXAM_START_TIME_AFTER_END_TIME);
+        }
+        return null;
+    }
+
+    /**
+     * 判断时间，如果说开始时间早于现在时间，就不允许编辑
+     *
+     * @param exam 传过来的竞赛数据
+     * @return 竞赛开始时间早于当前时间返回 true，说明未开赛
+     */
+    private boolean checkExam(Exam exam) {
+        // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
+        // 如果说早于就返回 true
+        // 竞赛的时间 ---- 现在的时间
+        return exam.getStartTime().isBefore(LocalDateTime.now());
     }
 
     /**
@@ -145,6 +348,12 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         return true;
     }
 
+    /**
+     * 查询竞赛的实现
+     *
+     * @param examId 需要查询的竞赛 id
+     * @return 返回查询到的这个竞赛的基本信息
+     */
     private Exam getExam(Long examId) {
         return examMapper.selectById(examId);
     }

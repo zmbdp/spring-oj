@@ -3,6 +3,7 @@ package com.zmbdp.system.controller.exam;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.system.domain.exam.dto.ExamAddDTO;
+import com.zmbdp.system.domain.exam.dto.ExamEditDTO;
 import com.zmbdp.system.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.system.domain.exam.dto.ExamQuestionAddDTO;
 import com.zmbdp.system.domain.exam.vo.ExamDetailVO;
@@ -32,15 +33,45 @@ public class ExamController {
         return examService.add(examAddDTO);
     }
 
-    // 新增有题目的竞赛
+    // 新增竞赛当中的题目
     @PostMapping("/question/add")
     public Result<Void> questionAdd(@RequestBody @Validated ExamQuestionAddDTO examQuestionAddDTO) {
         return examService.questionAdd(examQuestionAddDTO);
+    }
+
+    // 删除竞赛当中的题目
+    @DeleteMapping("/question/delete")
+    public Result<Void> questionDelete(@RequestParam Long examId, @RequestParam Long questionId) {
+        return examService.questionDelete(examId, questionId);
     }
 
     // 获取竞赛信息
     @GetMapping("/detail")
     public Result<ExamDetailVO> detail(@RequestParam("examId") Long examId) {
         return examService.detail(examId);
+    }
+
+    // 编辑竞赛
+    @PutMapping("/edit")
+    public Result<String> edit(@RequestBody ExamEditDTO examEditDTO) {
+        return examService.edit(examEditDTO);
+    }
+
+    // 编辑竞赛
+    @DeleteMapping("/delete")
+    public Result<Void> delete(@RequestParam Long examId) {
+        return examService.delete(examId);
+    }
+
+    // 发布功能
+    @PutMapping("/publish")
+    public Result<Void> publish(@RequestParam("examId") Long examId) {
+        return examService.publish(examId);
+    }
+
+    // 撤销发布
+    @PutMapping("/cancelPublish")
+    public Result<Void> cancelPublish(@RequestParam("examId") Long examId) {
+        return examService.cancelPublish(examId);
     }
 }

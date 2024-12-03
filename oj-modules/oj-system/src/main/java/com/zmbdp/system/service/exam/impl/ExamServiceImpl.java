@@ -260,8 +260,8 @@ public class ExamServiceImpl extends BaseService implements IExamService {
     /**
      * 撤销发布 service 层
      *
-     * @param examId
-     * @return
+     * @param examId 需要撤销的竞赛的id
+     * @return 是否撤销成功
      */
     @Override
     public Result<Void> cancelPublish(Long examId) {
@@ -269,13 +269,13 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
-        // 看看是否开始
-        if (checkExam(exam)) {
-            return Result.fail(ResultCode.EXAM_STARTED);
-        }
         // 看看是否结束
         if (exam.getEndTime().isBefore(LocalDateTime.now())) {
             return Result.fail(ResultCode.EXAM_IS_FINISH);
+        }
+        // 看看是否开始
+        if (checkExam(exam)) {
+            return Result.fail(ResultCode.EXAM_STARTED);
         }
         exam.setStatus(Constants.FALSE);
         examCacheManager.deleteCache(examId);

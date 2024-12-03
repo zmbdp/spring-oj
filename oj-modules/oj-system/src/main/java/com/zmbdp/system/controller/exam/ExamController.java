@@ -41,13 +41,13 @@ public class ExamController {
 
     // 删除竞赛当中的题目
     @DeleteMapping("/question/delete")
-    public Result<Void> questionDelete(@RequestParam Long examId, @RequestParam Long questionId) {
+    public Result<Void> questionDelete(Long examId, Long questionId) {
         return examService.questionDelete(examId, questionId);
     }
 
     // 获取竞赛信息
     @GetMapping("/detail")
-    public Result<ExamDetailVO> detail(@RequestParam("examId") Long examId) {
+    public Result<ExamDetailVO> detail(Long examId) {
         return examService.detail(examId);
     }
 
@@ -57,21 +57,21 @@ public class ExamController {
         return examService.edit(examEditDTO);
     }
 
-    // 编辑竞赛
+    // 删除竞赛
     @DeleteMapping("/delete")
-    public Result<Void> delete(@RequestParam Long examId) {
+    public Result<Void> delete(Long examId) {
         return examService.delete(examId);
     }
 
     // 发布功能
     @PutMapping("/publish")
-    public Result<Void> publish(@RequestParam("examId") Long examId) {
+    public Result<Void> publish(Long examId) {
         return examService.publish(examId);
     }
 
     // 撤销发布
     @PutMapping("/cancelPublish")
-    public Result<Void> cancelPublish(@RequestParam("examId") Long examId) {
+    public Result<Void> cancelPublish(Long examId) {
         return examService.cancelPublish(examId);
     }
 }

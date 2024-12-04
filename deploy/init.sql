@@ -1,7 +1,9 @@
 -- 要求：表名小写、多个单词用下划线隔开、全部都以 tb 开头
-create database if not exists spring_oj_dev charset utf8mb4;
+create
+database if not exists spring_oj_dev charset utf8mb4;
 
-use spring_oj_dev;
+use
+spring_oj_dev;
 
 -- 关于管理员的用户表
 drop table if exists tb_sys_user;
@@ -41,7 +43,7 @@ create table tb_question
 (
     question_id   bigint unsigned not null comment '题目id(主键)',
     title         varchar(50)   not null comment '题目标题',
-    difficulty    tinyint       not null comment '题目难度->1: 简单; 2: 普通 ; 3: 困难',
+    difficulty    tinyint       not null comment '题目难度 1: 简单; 2: 普通 ; 3: 困难',
     time_limit    int comment '时间限制(ms)',
     space_limit   int comment '空间限制(Byte)',
     content       varchar(1024) not null comment '题目内容',
@@ -78,9 +80,39 @@ create table tb_exam_question
     question_id      bigint unsigned not null comment '题目id',
     exam_id          bigint unsigned not null comment '竞赛id',
     question_order   int      not null comment '题目顺序',
-    create_by         bigint unsigned not null comment '创建人',
+    create_by        bigint unsigned not null comment '创建人',
     create_time      datetime not null comment '创建时间',
     update_by        bigint unsigned comment '更新人',
     update_time      datetime comment '更新时间',
     primary key (exam_question_id)
-) engine=innodb default charset=utf8 comment='竞赛题目关系表';
+) engine = innodb default character set = utf8mb4 comment = '竞赛题目关系表';
+
+-- 关于   对C端用户的管理的表
+drop table if exists tb_user;
+create table tb_user
+(
+    user_id     bigint unsigned not null comment '用户id（主键）',
+    nick_name   varchar(64) comment '用户昵称',
+    head_image  varchar(128) comment '用户头像',
+    sex         tinyint comment '用户状态 1: 男  2：女',
+    phone       char(11) not null comment '手机号',
+    code        char(6) comment '验证码',
+    email       varchar(64) comment '邮箱',
+    wechat      varchar(64) comment '微信号',
+    school_name varchar(64) comment '学校',
+    major_name  varchar(64) comment '专业',
+    introduce   varchar(128) comment '个人介绍',
+    status      tinyint  not null default '1'  comment '用户状态 0: 拉黑  1：正常',
+    create_by   bigint unsigned not null  comment '创建人',
+    create_time datetime not null comment '创建时间',
+    update_by   bigint unsigned  comment '更新人',
+    update_time datetime comment '更新时间',
+    primary key (`user_id`)
+) engine = innodb default character set = utf8mb4 comment = 'C端用户管理表';
+
+
+
+
+
+
+

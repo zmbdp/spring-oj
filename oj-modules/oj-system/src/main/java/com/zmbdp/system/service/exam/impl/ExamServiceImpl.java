@@ -246,6 +246,10 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
+        // 看看是否开始
+        if (checkExam(exam)) {
+            return Result.fail(ResultCode.EXAM_STARTED);
+        }
         Long count = examQuestionMapper
                 .selectCount(new LambdaQueryWrapper<ExamQuestion>()
                         .eq(ExamQuestion::getExamId, examId));

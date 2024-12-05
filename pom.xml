@@ -21,6 +21,7 @@
         <module>oj-modules</module>
         <module>oj-common</module>
         <module>oj-gateway</module>
+        <module>oj-common/oj-common-message</module>
     </modules>
 
     <properties>
@@ -36,12 +37,14 @@
         <hutool-all.version>5.8.22</hutool-all.version>
         <springdoc-openapi.version>2.2.0</springdoc-openapi.version>
         <pagehelper.boot.version>2.0.0</pagehelper.boot.version>
+        <aliyun-dysmsapi.version>3.0.0</aliyun-dysmsapi.version>
         <oj-common-core.version>1.0-SNAPSHOT</oj-common-core.version>
         <oj-common-swagger.version>1.0-SNAPSHOT</oj-common-swagger.version>
         <oj-common-redis.version>1.0-SNAPSHOT</oj-common-redis.version>
         <oj-common-security.version>1.0-SNAPSHOT</oj-common-security.version>
         <oj-common-mybatis.version>1.0-SNAPSHOT</oj-common-mybatis.version>
         <oj-system.version>1.0-SNAPSHOT</oj-system.version>
+        <oj-common-message.version>1.0-SNAPSHOT</oj-common-message.version>
     </properties>
 
     <dependencies>

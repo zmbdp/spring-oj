@@ -1,6 +1,7 @@
 package com.zmbdp.common.security.interceptor;
 
 import cn.hutool.core.util.StrUtil;
+import com.github.pagehelper.util.StringUtil;
 import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.security.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,14 +22,18 @@ public class TokenInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 在这里执行 token 的时间延长
-        tokenService.extendToken(getToken(request), secret);
+        String token = getToken(request);
+        if (StrUtil.isEmpty(token)) {
+            return true;
+        }
+        tokenService.extendToken(token, secret);
         return true;
     }
 
     // 从 request 中获取 token
     private String getToken(HttpServletRequest request) {
         String token = request.getHeader(HttpConstants.AUTHENTICATION);
-        if (StrUtil.isBlank(token) && token.startsWith(HttpConstants.PREFIX)) {
+        if (StringUtil.isNotEmpty(token) && StrUtil.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
             token = token.replaceFirst(HttpConstants.PREFIX, "");
         }
         return token;

@@ -17,4 +17,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>oj-common-message</artifactId>
+            <version>${oj-common-message.version}</version>
+        </dependency>
+
+    </dependencies>
+
 </project>

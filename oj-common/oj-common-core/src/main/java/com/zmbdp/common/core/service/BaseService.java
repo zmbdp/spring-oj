@@ -11,11 +11,11 @@ import java.util.List;
 public class BaseService {
 
     public Result<Void> toResult(int rows) {
-        return rows > 0 ? Result.success() : Result.fail(ResultCode.ERROR);
+        return rows > 0 ? Result.success() : Result.fail();
     }
 
     public Result<Void> toResult(boolean result) {
-        return result ? Result.success() : Result.fail(ResultCode.ERROR);
+        return result ? Result.success() : Result.fail();
     }
 
     public TableDataInfo getTableDataInfo(List<?> list) {

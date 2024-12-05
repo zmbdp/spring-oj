@@ -1,0 +1,8 @@
+com\zmbdp\friend\controller\UserController.class
+com\zmbdp\friend\domain\dto\UserDTO.class
+com\zmbdp\friend\OjFriendApplication.class
+com\zmbdp\friend\test\TestController.class
+com\zmbdp\friend\service\impl\UserServiceImpl.class
+com\zmbdp\friend\service\IUserService.class
+com\zmbdp\friend\domain\User.class
+com\zmbdp\friend\mapper\UserMapper.class

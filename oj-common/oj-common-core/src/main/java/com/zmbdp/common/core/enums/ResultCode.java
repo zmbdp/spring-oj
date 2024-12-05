@@ -25,6 +25,12 @@ public enum ResultCode {
     FAILED_LOGIN(3103, "账号或密码错误，请重新输入"),
     FAILED_USER_BANNED(3104, "您已被列入黑名单，请联系管理员"),
     TITLE_CANNOT_BE_NULL(3105, "标题不能为空"),
+    FAILED_USER_PHONE(3106, "您输入的手机号有误，请重新输入"),
+    FAILED_FREQUENT(3107, "操作频繁，请稍后重试"),
+    FAILED_TIME_LIMIT(3108, "当天请求次数已达到上限"),
+    FAILED_SEND_CODE(3109, "验证码发送错误"),
+    FAILED_INVALID_CODE(3110, "验证码无效"),
+    FAILED_ERROR_CODE(3111, "验证码错误"),
 
     // 竞赛相关状态码
     EXAM_START_TIME_BEFORE_CURRENT_TIME(3201, "竞赛开始时间不能早于当前时间"),

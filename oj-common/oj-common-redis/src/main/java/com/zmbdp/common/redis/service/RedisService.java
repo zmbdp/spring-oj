@@ -111,6 +111,16 @@ public class RedisService {
         return (value instanceof String) ? value : JSON.parseObject(String.valueOf(value), clazz);
     }
 
+    /**
+     * 计数器加一操作
+     *
+     * @param key redis 的 key
+     * @return 目前的是多大
+     */
+    public Long increment(final String key) {
+        return redisTemplate.opsForValue().increment(key);
+    }
+
     //************************ List 操作 ***************************
 
     /**

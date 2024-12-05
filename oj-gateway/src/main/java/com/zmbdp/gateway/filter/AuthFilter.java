@@ -16,6 +16,7 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -38,6 +39,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@RefreshScope
 public class AuthFilter implements GlobalFilter, Ordered {
 
     @Autowired

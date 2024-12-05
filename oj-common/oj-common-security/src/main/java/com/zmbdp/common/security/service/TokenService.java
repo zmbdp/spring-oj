@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Service
 @Slf4j
+@Service
 public class TokenService {
     @Autowired
     private RedisService redisService;

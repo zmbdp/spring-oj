@@ -40,7 +40,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     private Integer sendLimit;
 
     /**
-     * C端用户获取验证码请求
+     * C端用户登录获取验证码 service 层
      *
      * @param userDTO 登录参数
      * @return 成功与否

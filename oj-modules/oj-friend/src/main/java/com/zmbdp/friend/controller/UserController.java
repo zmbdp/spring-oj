@@ -17,7 +17,7 @@ public class UserController {
     private IUserService userService;
 
     /**
-     * C端用户登录
+     * C端用户登录获取验证码
      * @param userDTO 用户登录输入的参数
      * @return 成功与否
      */

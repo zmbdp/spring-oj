@@ -1,4 +1,4 @@
-package com.zmbdp.friend.service.impl;
+package com.zmbdp.friend.service.user.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -7,7 +7,9 @@ import com.github.pagehelper.util.StringUtil;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.constants.UserConstants;
+import com.zmbdp.common.core.domain.LoginUser;
 import com.zmbdp.common.core.domain.Result;
+import com.zmbdp.common.core.domain.vo.LoginUserVO;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.core.enums.UserStatus;
@@ -15,10 +17,11 @@ import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.message.service.AliSmsService;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.common.security.service.TokenService;
-import com.zmbdp.friend.domain.User;
-import com.zmbdp.friend.domain.dto.UserDTO;
+import com.zmbdp.friend.domain.user.User;
+import com.zmbdp.friend.domain.user.dto.UserDTO;
 import com.zmbdp.friend.mapper.UserMapper;
-import com.zmbdp.friend.service.IUserService;
+import com.zmbdp.friend.service.user.IUserService;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +70,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
      * @return 是否是正常的
      */
     public static boolean checkPhone(String phone) {
-        Pattern regex = Pattern.compile("^1[2|3|4|5|6|7|8|9][0-9]\\d{8}$");
+        Pattern regex = Pattern.compile("^1[3|4|5|6|7|8|9][0-9]\\d{8}$");
         Matcher m = regex.matcher(phone);
         return m.matches();
     }
@@ -152,14 +155,43 @@ public class UserServiceImpl extends BaseService implements IUserService {
             user.setNickName(UserConstants.DEFAULT_NICK_NAME);
             user.setIntroduce(UserConstants.DEFAULT_INTRODUCE);
             user.setStatus(UserStatus.Normal.getValue());
+            user.setHeadImage(UserConstants.DEFAULT_HEAD_IMAGE);
             userMapper.insert(user);
         }
 
         // 说明是老用户，直接登录就行了
         // 生成一个 token，返回给前端
         String token = tokenService.createToken(user.getUserId(), user.getNickName(),
-                secret, UserIdentity.ORDINARY.getValue());
+                secret, UserIdentity.ORDINARY.getValue(), user.getHeadImage());
         return Result.success(token);
+    }
+
+    /**
+     * C端用户退出登录功能代码
+     * @param token 令牌
+     * @return 是否成功
+     */
+    @Override
+    public Result<Void> logout(String token) {
+        if (StringUtils.isEmpty(token)) {
+            return Result.fail(ResultCode.ERROR);
+        }
+        return toResult(tokenService.delLoginUser(token, secret));
+    }
+
+    @Override
+    public Result<LoginUserVO> info(String token) {
+        if (StringUtils.isEmpty(token)) {
+            return Result.fail(ResultCode.ERROR);
+        }
+        LoginUser loginUser = tokenService.getLoginUser(token, secret);
+        if (loginUser == null) {
+            return Result.fail();
+        }
+        LoginUserVO loginUserVO = new LoginUserVO();
+        loginUserVO.setNickName(loginUser.getNickName());
+        loginUserVO.setHeadImage(loginUser.getHeadImage());
+        return Result.success(loginUserVO);
     }
 
     @Nullable

@@ -3,7 +3,7 @@ package com.zmbdp.system.controller.sysuser;
 import cn.hutool.core.util.StrUtil;
 import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.domain.Result;
-import com.zmbdp.system.domain.sysuser.vo.LoginUserVO;
+import com.zmbdp.common.core.domain.vo.LoginUserVO;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.system.domain.sysuser.dto.LoginDTO;
 import com.zmbdp.system.domain.sysuser.dto.SysUserSaveDTO;

@@ -1,4 +1,4 @@
-package com.zmbdp.friend.domain.dto;
+package com.zmbdp.friend.domain.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

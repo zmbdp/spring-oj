@@ -21,7 +21,7 @@ public class TokenService {
     @Autowired
     private RedisService redisService;
     // 生成一个 token
-    public String createToken(Long userId, String nickName, String secret, Integer identity) {
+    public String createToken(Long userId, String nickName, String secret, Integer identity, String headImage) {
         Map<String, Object> claims = new HashMap<>();
         String userKey = UUID.fastUUID().toString(); // 把 hutool 产生的 UUID 当作唯一主键
         claims.put(JwtConstants.LOGIN_USER_ID, userId);
@@ -32,6 +32,7 @@ public class TokenService {
         LoginUser loginUser = new LoginUser();
         loginUser.setIdentity(identity); // 是管理员，所以设置成 2
         loginUser.setNickName(nickName);
+        loginUser.setHeadImage(headImage);
         redisService.setCacheObject(redisKey, loginUser, CacheConstants.EXP, TimeUnit.MINUTES);
         return token;
     }

@@ -9,4 +9,6 @@ public class LoginUser {
     private Integer identity;
 
     private String nickName;// 用户昵称
+
+    private String headImage; // 头像
 }

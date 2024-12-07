@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.domain.LoginUser;
 import com.zmbdp.common.core.domain.Result;
-import com.zmbdp.system.domain.sysuser.vo.LoginUserVO;
+import com.zmbdp.common.core.domain.vo.LoginUserVO;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.security.service.TokenService;
@@ -50,7 +50,7 @@ public class SysUserServiceImpl extends BaseService implements ISysUserService {
         // 表示全都对上了，生成一个 Token 并且在 redis 中存储好，把 token 返回给前端，
         // 后面携带这个 token，直接来验证
         String token = tokenService.createToken(sysUser.getUserId(), sysUser.getNickName(),
-                secret, UserIdentity.ADMIN.getValue());
+                secret, UserIdentity.ADMIN.getValue(), null);
         return Result.success(token);
     }
 
@@ -101,6 +101,6 @@ public class SysUserServiceImpl extends BaseService implements ISysUserService {
         if (StringUtils.isEmpty(token)) {
             return Result.fail(ResultCode.ERROR);
         }
-        return tokenService.delLoginUser(token, secret) ? Result.success() : Result.fail();
+        return toResult(tokenService.delLoginUser(token, secret));
     }
 }

@@ -32,7 +32,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * 拉黑或解禁功能 service 层
-     * @param userDTO 用户数据
+     * @param userDTO 操作的用户
      * @return 成功与否
      */
     @Override

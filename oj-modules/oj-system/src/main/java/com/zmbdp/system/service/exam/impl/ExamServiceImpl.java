@@ -46,9 +46,9 @@ public class ExamServiceImpl extends BaseService implements IExamService {
     private ExamCacheManager examCacheManager;
 
     /**
-     * 获取题目列表 service 层
+     * 获取竞赛列表 service 层
      *
-     * @param examQueryDTO 符合这些要求的题目
+     * @param examQueryDTO 符合这些要求的竞赛
      * @return 这一页的数据
      */
     @Override
@@ -94,9 +94,10 @@ public class ExamServiceImpl extends BaseService implements IExamService {
             // 先拿到这些数据，如果说没有的话也行
             return null;
         }
-        // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
-        if (checkExam(exam)) {
-            return Result.fail(ResultCode.EXAM_STARTED);
+        // 校验时间
+        Result<Void> validationResult = checkTime(exam);
+        if (validationResult != null) {
+            return validationResult;
         }
         // 如果已经发布就不允许添加
         if (Constants.TRUE.equals(exam.getStatus())) {
@@ -130,9 +131,10 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         if (questionMapper.selectById(questionId) == null) {
             return Result.fail(ResultCode.EXAM_QUESTION_NOT_EXISTS);
         }
-        // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
-        if (checkExam(exam)) {
-            return Result.fail(ResultCode.EXAM_STARTED);
+        // 校验时间
+        Result<Void> validationResult = checkTime(exam);
+        if (validationResult != null) {
+            return validationResult;
         }
         if (Constants.TRUE.equals(exam.getStatus())) {
             return Result.fail(ResultCode.EXAM_IS_PUBLISH);
@@ -192,7 +194,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
         // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
-        if (checkExam(exam)) {
+        if (checkTime(exam) != null) {
             return Result.fail(ResultCode.EXAM_STARTED);
         }
         if (Constants.TRUE.equals(exam.getStatus())) {
@@ -224,8 +226,10 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         if (Constants.TRUE.equals(exam.getStatus())) {
             return Result.fail(ResultCode.EXAM_IS_PUBLISH);
         }
-        if (checkExam(exam)) {
-            return Result.fail(ResultCode.EXAM_STARTED);
+        // 校验时间
+        Result<Void> validationResult = checkTime(exam);
+        if (validationResult != null) {
+            return validationResult;
         }
         return toResult(
                 examMapper.deleteById(exam) +
@@ -246,9 +250,10 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
-        // 看看是否开始
-        if (checkExam(exam)) {
-            return Result.fail(ResultCode.EXAM_STARTED);
+        // 校验时间
+        Result<Void> validationResult = checkTime(exam);
+        if (validationResult != null) {
+            return validationResult;
         }
         Long count = examQuestionMapper
                 .selectCount(new LambdaQueryWrapper<ExamQuestion>()
@@ -258,6 +263,8 @@ public class ExamServiceImpl extends BaseService implements IExamService {
             return Result.fail(ResultCode.EXAM_NOT_HAS_QUESTION);
         }
         exam.setStatus(Constants.TRUE);
+        // 添加到 redis 的缓存中
+        examCacheManager.addCache(exam);
         return toResult(examMapper.updateById(exam));
     }
 
@@ -273,15 +280,13 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
-        // 看看是否结束
-        if (exam.getEndTime().isBefore(LocalDateTime.now())) {
-            return Result.fail(ResultCode.EXAM_IS_FINISH);
-        }
-        // 看看是否开始
-        if (checkExam(exam)) {
-            return Result.fail(ResultCode.EXAM_STARTED);
+        // 校验时间
+        Result<Void> validationResult = checkTime(exam);
+        if (validationResult  != null) {
+            return validationResult ;
         }
         exam.setStatus(Constants.FALSE);
+        // 再从 redis 中删除这个竞赛的缓存
         examCacheManager.deleteCache(examId);
         return toResult(examMapper.updateById(exam));
     }
@@ -322,11 +327,17 @@ public class ExamServiceImpl extends BaseService implements IExamService {
      * @param exam 传过来的竞赛数据
      * @return 竞赛开始时间早于当前时间返回 true，说明未开赛
      */
-    private boolean checkExam(Exam exam) {
+    private Result<Void> checkTime(Exam exam) {
         // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
         // 如果说早于就返回 true
-        // 竞赛的时间 ---- 现在的时间
-        return exam.getStartTime().isBefore(LocalDateTime.now());
+        // 竞赛开始的时间 ---- 现在的时间
+        if (exam.getStartTime().isBefore(LocalDateTime.now())) {
+            return Result.fail(ResultCode.EXAM_STARTED);
+        }
+        if (exam.getEndTime().isBefore(LocalDateTime.now())) {
+            return Result.fail(ResultCode.EXAM_IS_FINISH);
+        }
+        return null;
     }
 
     /**

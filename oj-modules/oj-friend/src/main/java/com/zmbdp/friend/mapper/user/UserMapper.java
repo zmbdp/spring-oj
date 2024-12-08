@@ -1,4 +1,4 @@
-package com.zmbdp.friend.mapper;
+package com.zmbdp.friend.mapper.user;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zmbdp.friend.domain.user.User;

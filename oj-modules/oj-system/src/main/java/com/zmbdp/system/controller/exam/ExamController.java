@@ -21,7 +21,7 @@ public class ExamController {
     @Autowired
     private IExamService examService;
 
-    // 获取题目列表
+    // 获取竞赛列表
     @GetMapping("/list")
     public TableDataInfo list(ExamQueryDTO examQueryDTO) {
         return examService.list(examQueryDTO);

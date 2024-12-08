@@ -112,6 +112,35 @@ public class RedisService {
     }
 
     /**
+     * 批量获取
+     * @param keyList 需要获取的 key 的数组
+     * @param clazz 类型
+     * @return 返回获取到的 value
+     * @param <T>
+     */
+    public <T> List<T> multiGet(final List<String> keyList, Class<T> clazz) {
+        List list = redisTemplate.opsForValue().multiGet(keyList);
+        if (list == null || list.size() <= 0) {
+            return null;
+        }
+        List<T> result = new ArrayList<>();
+        for (Object o : list) {
+            result.add(JSON.parseObject(String.valueOf(o), clazz));
+        }
+        return result;
+    }
+
+    /**
+     * 批量插入
+     * @param map 需要插入的 key 和 value
+     * @param <K>
+     * @param <V>
+     */
+    public <K, V> void multiSet(Map<? extends K, ? extends V> map) {
+        redisTemplate.opsForValue().multiSet((Map<? extends String, ?>) map);
+    }
+
+    /**
      * 计数器加一操作
      *
      * @param key redis 的 key
@@ -178,6 +207,15 @@ public class RedisService {
      */
     public <T> Long removeForList(final String key, T value) {
         return redisTemplate.opsForList().remove(key, 1L, value);
+    }
+
+    public <T> Long indexOfForList(final String key, T value) {
+        return redisTemplate.opsForList().indexOf(key, value);
+    }
+
+    public <T> T indexForList(final String key, long index, Class<T> clazz) {
+        Object t = redisTemplate.opsForList().index(key, index);
+        return JSON.parseObject(String.valueOf(t), clazz);
     }
 
     //************************ Hash 操作 ***************************

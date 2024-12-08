@@ -19,7 +19,7 @@ import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.common.security.service.TokenService;
 import com.zmbdp.friend.domain.user.User;
 import com.zmbdp.friend.domain.user.dto.UserDTO;
-import com.zmbdp.friend.mapper.UserMapper;
+import com.zmbdp.friend.mapper.user.UserMapper;
 import com.zmbdp.friend.service.user.IUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;

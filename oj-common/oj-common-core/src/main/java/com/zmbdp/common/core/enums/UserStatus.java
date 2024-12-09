@@ -10,7 +10,7 @@ public enum UserStatus {
     Normal(1),
     ;
 
-    private Integer value;
+    private final Integer value;
 
     UserStatus(Integer value) {
         this.value = value;

@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate redisTemplate;
 
     //************************ Key 操作 ***************************
 
@@ -106,7 +106,7 @@ public class RedisService {
      * @return 缓存的数据
      */
     public <T> T getCacheObject(final String key, Class<T> clazz) {
-        ValueOperations<String, T> operation = (ValueOperations<String, T>) redisTemplate.opsForValue();
+        ValueOperations<String, T> operation = redisTemplate.opsForValue();
         T value = operation.get(key);
         return (value instanceof String) ? value : JSON.parseObject(String.valueOf(value), clazz);
     }
@@ -137,7 +137,7 @@ public class RedisService {
      * @param <V>
      */
     public <K, V> void multiSet(Map<? extends K, ? extends V> map) {
-        redisTemplate.opsForValue().multiSet((Map<? extends String, ?>) map);
+        redisTemplate.opsForValue().multiSet(map);
     }
 
     /**

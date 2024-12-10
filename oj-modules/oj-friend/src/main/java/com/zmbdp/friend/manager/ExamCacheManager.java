@@ -31,12 +31,6 @@ public class ExamCacheManager {
     @Autowired
     private ExamMapper examMapper;
 
-//    @Autowired
-//    private ExamQuestionMapper examQuestionMapper;
-
-//    @Autowired
-//    private UserExamMapper userExamMapper;
-
     @Autowired
     private RedisService redisService;
 
@@ -53,20 +47,6 @@ public class ExamCacheManager {
     public Long getRankListSize(Long examId) {
         return redisService.getListSize(getExamRankListKey(examId));
     }
-
-//    public List<ExamVO> getExamVOList(ExamQueryDTO examQueryDTO, Long userId) {
-//        int start = (examQueryDTO.getPageNum() - 1) * examQueryDTO.getPageSize();
-//        int end = start + examQueryDTO.getPageSize() - 1; // 下标需要 -1
-//        String examListKey = getExamListKey(examQueryDTO.getType(), userId);
-//        List<Long> examIdList = redisService.getCacheListByRange(examListKey, start, end, Long.class);
-//        List<ExamVO> examVOList = assembleExamVOList(examIdList);
-//        if (CollectionUtil.isEmpty(examVOList)) {
-//            // 说明 redis 中数据可能有问题 从数据库中查数据并且重新刷新缓存
-//            examVOList = getExamListByDB(examQueryDTO, userId); // 从数据库中获取数据
-//            refreshCache(examQueryDTO.getType(), userId);
-//        }
-//        return examVOList;
-//    }
 
     public List<ExamVO> getExamVOList(ExamQueryDTO examQueryDTO) {
         int start = (examQueryDTO.getPageNum() - 1) * examQueryDTO.getPageSize();
@@ -87,21 +67,6 @@ public class ExamCacheManager {
         int end = start + examRankDTO.getPageSize() - 1; // 下标需要 -1
         return redisService.getCacheListByRange(getExamRankListKey(examRankDTO.getExamId()), start, end, ExamRankVO.class);
     }
-
-//    public List<Long> getAllUserExamList(Long userId) {
-//        String examListKey = CacheConstants.USER_EXAM_LIST + userId;
-//        List<Long> userExamIdList = redisService.getCacheListByRange(examListKey, 0, -1, Long.class);
-//        if (CollectionUtil.isNotEmpty(userExamIdList)) {
-//            return userExamIdList;
-//        }
-//        List<UserExam> userExamList =
-//                userExamMapper.selectList(new LambdaQueryWrapper<UserExam>().eq(UserExam::getUserId, userId));
-//        if (CollectionUtil.isEmpty(userExamList)) {
-//            return null;
-//        }
-//        refreshCache(ExamListType.USER_EXAM_LIST.getValue(), userId);
-//        return userExamList.stream().map(UserExam::getExamId).collect(Collectors.toList());
-//    }
 
     public void addUserExamCache(Long userId, Long examId) {
         String userExamListKey = getUserExamListKey(userId);
@@ -187,16 +152,6 @@ public class ExamCacheManager {
         }
         return examVOList;
     }
-
-//    private String getExamListKey(Integer examListType, Long userId) {
-//        if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) {
-//            return CacheConstants.EXAM_UNFINISHED_LIST;
-//        } else if (ExamListType.EXAM_HISTORY_LIST.getValue().equals(examListType)) {
-//            return CacheConstants.EXAM_HISTORY_LIST;
-//        } else {
-//            return CacheConstants.USER_EXAM_LIST + userId;
-//        }
-//    }
 
     private String getExamListKey(Integer examListType) {
         if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) {

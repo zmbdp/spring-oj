@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @RefreshScope
 @Configuration
 public class XxlJobConfig {
-    
+
     @Value("${xxl.job.admin.addresses}")
     private String adminAddresses;
 
@@ -23,7 +23,6 @@ public class XxlJobConfig {
 
     @Bean
     public XxlJobSpringExecutor xxlJobExecutor() {
-        log.info(">>>>>>>>>>> xxl-job config init.");
         XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         xxlJobSpringExecutor.setAdminAddresses(adminAddresses);
         xxlJobSpringExecutor.setAppname(appname);

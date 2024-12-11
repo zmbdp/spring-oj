@@ -7,6 +7,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ExamRankDTO extends PageQueryDTO {
-
     private Long examId;
 }

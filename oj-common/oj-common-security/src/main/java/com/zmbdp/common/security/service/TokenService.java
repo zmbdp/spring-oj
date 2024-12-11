@@ -3,9 +3,9 @@ package com.zmbdp.common.security.service;
 import cn.hutool.core.lang.UUID;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.JwtConstants;
-import com.zmbdp.common.redis.service.RedisService;
-import com.zmbdp.common.core.utils.JwtUtils;
 import com.zmbdp.common.core.domain.LoginUser;
+import com.zmbdp.common.core.utils.JwtUtils;
+import com.zmbdp.common.redis.service.RedisService;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,15 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class TokenService {
+
     @Autowired
     private RedisService redisService;
+
+    // 转换成 redis 中存储的 key
+    private static String getRedisKey(String userKey) {
+        return CacheConstants.LOGIN_TOKEN_KEY + userKey;
+    }
+
     // 生成一个 token
     public String createToken(Long userId, String nickName, String secret, Integer identity, String headImage) {
         Map<String, Object> claims = new HashMap<>();
@@ -51,11 +58,6 @@ public class TokenService {
             // 然后就开始延长
             redisService.expire(redisKey, CacheConstants.EXP, TimeUnit.MINUTES);
         }
-    }
-
-    // 转换成 redis 中存储的 key
-    private static String getRedisKey(String userKey) {
-        return CacheConstants.LOGIN_TOKEN_KEY + userKey;
     }
 
     private String getUserKey(String token, String secret) {
@@ -91,5 +93,26 @@ public class TokenService {
         // 然后再删除掉 redis 中的这个 key
         String redisKey = getRedisKey(userKey);
         return redisService.deleteObject(redisKey);
+    }
+
+    /**
+     * 获取 token 中的 userId
+     * @param token 令牌
+     * @param secret 解析 secret
+     * @return userId
+     */
+    public Long getUserId(String token, String secret) {
+        Claims claims;
+        try {
+            claims = JwtUtils.getTokenMsg(token, secret); // 获取令牌中信息 解析 payload 中信息
+            if (claims == null) {
+                log.error("解析 token: {} 出现异常", token);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("解析 token: {} 出现异常", token, e);
+            return null;
+        }
+        return Long.valueOf(JwtUtils.getUserId(claims)); // 获取 jwt 中的 userId
     }
 }

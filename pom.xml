@@ -37,9 +37,11 @@
         <hutool-all.version>5.8.22</hutool-all.version>
         <springdoc-openapi.version>2.2.0</springdoc-openapi.version>
         <pagehelper.boot.version>2.0.0</pagehelper.boot.version>
-        <aliyun-dysmsapi.version>3.0.0</aliyun-dysmsapi.version>
         <xxl-job.version>2.4.0</xxl-job.version>
         <transmittable-thread-local.version>2.14.4</transmittable-thread-local.version>
+
+        <aliyun-dysmsapi.version>3.0.0</aliyun-dysmsapi.version>
+
         <oj-common-core.version>1.0-SNAPSHOT</oj-common-core.version>
         <oj-common-swagger.version>1.0-SNAPSHOT</oj-common-swagger.version>
         <oj-common-redis.version>1.0-SNAPSHOT</oj-common-redis.version>

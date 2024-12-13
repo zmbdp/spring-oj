@@ -2,10 +2,14 @@ package com.zmbdp.friend.controller.user;
 
 import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.domain.Result;
+import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.friend.domain.exam.dto.ExamDTO;
+import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.friend.service.user.IUserExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user/exam")
@@ -23,5 +27,10 @@ public class UserExamController {
     @PostMapping("/enter")
     public Result<Void> enter(@RequestHeader(HttpConstants.AUTHENTICATION) String token, @RequestBody ExamDTO examDTO) {
         return userExamService.enter(token, examDTO.getExamId());
+    }
+
+    @GetMapping("/list")
+    public TableDataInfo list(ExamQueryDTO examQueryDTO) {
+        return userExamService.list(examQueryDTO);
     }
 }

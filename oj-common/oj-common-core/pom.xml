@@ -42,11 +42,6 @@
             <version>${jaxb-api.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.zmbdp</groupId>
-            <artifactId>oj-common-mybatis</artifactId>
-            <version>${oj-common-mybatis.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.github.pagehelper</groupId>
@@ -58,6 +53,13 @@
             <groupId>com.alibaba</groupId>
             <artifactId>transmittable-thread-local</artifactId>
             <version>${transmittable-thread-local.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
         </dependency>
 
     </dependencies>

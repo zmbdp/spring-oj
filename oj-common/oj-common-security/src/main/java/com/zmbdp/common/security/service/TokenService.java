@@ -44,9 +44,18 @@ public class TokenService {
         return token;
     }
 
+    /**
+     * 获取 token 中的 userId
+     * @return userId
+     */
+    public Long getUserId(Claims claims) {
+        if (claims == null) return null;
+        return Long.valueOf(JwtUtils.getUserId(claims)); // 获取 jwt 中的 userId
+    }
+
     // 什么时候延长？ -> 首先肯定是在身份验证完成之后，这时候 redis 里面才会有 key，并且肯定是要在 controller 层之前
-    public void extendToken(String token, String secret) {
-        String userKey = getUserKey(token, secret);
+    public void extendToken(Claims claims) {
+        String userKey = getUserKey(claims);
         if (userKey == null) {
             return;
         }
@@ -60,7 +69,20 @@ public class TokenService {
         }
     }
 
+    public String getUserKey(Claims claims) {
+        if (claims == null) return null;
+        return JwtUtils.getUserKey(claims); // 获取 jwt 中的 key
+    }
+
     private String getUserKey(String token, String secret) {
+        Claims claims = getClaims(token, secret);
+        if (claims == null) {
+            return null;
+        }
+        return JwtUtils.getUserKey(claims); // 获取 jwt 中的 key
+    }
+
+    public static Claims getClaims(String token, String secret) {
         Claims claims;
         try {
             claims = JwtUtils.getTokenMsg(token, secret); // 获取令牌中信息 解析 payload 中信息
@@ -72,7 +94,7 @@ public class TokenService {
             log.error("解析 token: {} 出现异常", token, e);
             return null;
         }
-        return JwtUtils.getUserKey(claims); // 获取 jwt 中的 key
+        return claims;
     }
 
     public LoginUser getLoginUser(String token, String secret) {
@@ -93,26 +115,5 @@ public class TokenService {
         // 然后再删除掉 redis 中的这个 key
         String redisKey = getRedisKey(userKey);
         return redisService.deleteObject(redisKey);
-    }
-
-    /**
-     * 获取 token 中的 userId
-     * @param token 令牌
-     * @param secret 解析 secret
-     * @return userId
-     */
-    public Long getUserId(String token, String secret) {
-        Claims claims;
-        try {
-            claims = JwtUtils.getTokenMsg(token, secret); // 获取令牌中信息 解析 payload 中信息
-            if (claims == null) {
-                log.error("解析 token: {} 出现异常", token);
-                return null;
-            }
-        } catch (Exception e) {
-            log.error("解析 token: {} 出现异常", token, e);
-            return null;
-        }
-        return Long.valueOf(JwtUtils.getUserId(claims)); // 获取 jwt 中的 userId
     }
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.util.StringUtil;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.Constants;
+import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.constants.UserConstants;
 import com.zmbdp.common.core.domain.LoginUser;
 import com.zmbdp.common.core.domain.Result;
@@ -176,13 +177,17 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (StringUtils.isEmpty(token)) {
             return Result.fail(ResultCode.ERROR);
         }
+        // 从数据库中删除这个信息
         return toResult(tokenService.delLoginUser(token, secret));
     }
 
     @Override
     public Result<LoginUserVO> info(String token) {
-        if (StringUtils.isEmpty(token)) {
+        if (StringUtils.isEmpty(token) ) {
             return Result.fail(ResultCode.ERROR);
+        }
+        if (StringUtils.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
+            token = token.replaceFirst(HttpConstants.PREFIX, StringUtils.EMPTY);
         }
         LoginUser loginUser = tokenService.getLoginUser(token, secret);
         if (loginUser == null) {

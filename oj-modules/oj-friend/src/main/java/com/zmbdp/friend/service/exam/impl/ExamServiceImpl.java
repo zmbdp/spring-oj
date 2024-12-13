@@ -45,20 +45,20 @@ public class ExamServiceImpl extends BaseService implements IExamService {
      */
     @Override
     public TableDataInfo redisList(ExamQueryDTO examQueryDTO) {
-        Long total = examCacheManager.getListSize(examQueryDTO.getType());
+        Long total = examCacheManager.getListSize(examQueryDTO.getType(), null);
         List<ExamVO> examVOList;
         if (total == null || total <= 0) {
             // 说明从 redis 中未查询到数据，直接从数据库中查询就可以了
             examVOList = list(examQueryDTO);
             // 然后放到 redis 的缓存中
-            examCacheManager.refreshCache(examQueryDTO.getType());
+            examCacheManager.refreshCache(examQueryDTO.getType(), null);
             // 从数据库中查到的数据直接调用 page 插件赋值
             total = new PageInfo<>(examVOList).getTotal();
         } else {
             // 如果有的话直接拿到这部分数据
-            examVOList = examCacheManager.getExamVOList(examQueryDTO);
+            examVOList = examCacheManager.getExamVOList(examQueryDTO, null);
             // redis 中查数据的话直接就是 listSize，但是可能上一步出现问题，重新从数据库中刷新缓存了，这时候 size 就会改变
-            total = examCacheManager.getListSize(examQueryDTO.getType());
+            total = examCacheManager.getListSize(examQueryDTO.getType(), null);
         }
         if (CollectionUtil.isEmpty(examVOList)) {
             // 说明未查询到任何数据

@@ -4,12 +4,14 @@ package com.zmbdp.gateway.filter;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.zmbdp.common.core.constants.CacheConstants;
+import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.domain.LoginUser;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.core.utils.JwtUtils;
+import com.zmbdp.common.core.utils.ThreadLocalUtil;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.gateway.properties.IgnoreWhiteProperties;
 import io.jsonwebtoken.Claims;
@@ -104,7 +106,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
                 !UserIdentity.ORDINARY.getValue().equals(user.getIdentity())) { // 但是他不是普通用户的话
             return unauthorizedResponse(exchange, "令牌验证失败");
         }
-
         return chain.filter(exchange);
     }
 

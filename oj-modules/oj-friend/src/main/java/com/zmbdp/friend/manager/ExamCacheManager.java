@@ -1,5 +1,6 @@
 package com.zmbdp.friend.manager;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -16,6 +17,7 @@ import com.zmbdp.friend.domain.exam.dto.ExamRankDTO;
 import com.zmbdp.friend.domain.exam.vo.ExamRankVO;
 import com.zmbdp.friend.domain.exam.vo.ExamVO;
 import com.zmbdp.friend.mapper.exam.ExamMapper;
+import com.zmbdp.friend.mapper.user.UserExamMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,10 +34,13 @@ public class ExamCacheManager {
     private ExamMapper examMapper;
 
     @Autowired
+    private UserExamMapper userExamMapper;
+
+    @Autowired
     private RedisService redisService;
 
-    public Long getListSize(Integer examListType) {
-        String examListKey = getExamListKey(examListType);
+    public Long getListSize(Integer examListType, Long userId) {
+        String examListKey = getExamListKey(examListType, userId);
         return redisService.getListSize(examListKey);
     }
 
@@ -48,16 +53,16 @@ public class ExamCacheManager {
         return redisService.getListSize(getExamRankListKey(examId));
     }
 
-    public List<ExamVO> getExamVOList(ExamQueryDTO examQueryDTO) {
+    public List<ExamVO> getExamVOList(ExamQueryDTO examQueryDTO, Long userId) {
         int start = (examQueryDTO.getPageNum() - 1) * examQueryDTO.getPageSize();
         int end = start + examQueryDTO.getPageSize() - 1; // 下标需要 -1
-        String examListKey = getExamListKey(examQueryDTO.getType());
+        String examListKey = getExamListKey(examQueryDTO.getType(), userId);
         List<Long> examIdList = redisService.getCacheListByRange(examListKey, start, end, Long.class);
         List<ExamVO> examVOList = assembleExamVOList(examIdList);
         if (CollectionUtil.isEmpty(examVOList)) {
             // 说明 redis 中数据可能有问题 从数据库中查数据并且重新刷新缓存
             examVOList = getExamListByDB(examQueryDTO); // 从数据库中获取数据
-            refreshCache(examQueryDTO.getType());
+            refreshCache(examQueryDTO.getType(), userId);
         }
         return examVOList;
     }
@@ -95,7 +100,7 @@ public class ExamCacheManager {
     }
 
     //刷新缓存逻辑
-    public void refreshCache(Integer examListType) {
+    public void refreshCache(Integer examListType, Long userId) {
         List<Exam> examList = new ArrayList<>();
         if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) {
             // 查询未完赛的竞赛列表
@@ -113,6 +118,10 @@ public class ExamCacheManager {
                     .eq(Exam::getStatus, Constants.TRUE)
                     .orderByAsc(Exam::getCreateTime)
             );
+        } else if (ExamListType.USER_EXAM_LIST.getValue().equals(examListType)) {
+            // 说明是查询用户竞赛列表
+            List<ExamVO> examVOList = userExamMapper.selectUserExamList(userId);
+            examList = BeanUtil.copyToList(examVOList, Exam.class);
         }
         if (CollectionUtil.isEmpty(examList)) {
             return;
@@ -124,8 +133,8 @@ public class ExamCacheManager {
             examIdList.add(exam.getExamId());
         }
         redisService.multiSet(examMap);
-        redisService.deleteObject(getExamListKey(examListType));
-        redisService.rightPushAll(getExamListKey(examListType), examIdList);
+        redisService.deleteObject(getExamListKey(examListType, userId));
+        redisService.rightPushAll(getExamListKey(examListType, userId), examIdList);
     }
 
     private List<ExamVO> getExamListByDB(ExamQueryDTO examQueryDTO) {
@@ -153,13 +162,14 @@ public class ExamCacheManager {
         return examVOList;
     }
 
-    private String getExamListKey(Integer examListType) {
+    private String getExamListKey(Integer examListType, Long userId) {
         if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) {
             return CacheConstants.EXAM_UNFINISHED_LIST;
         } else if (ExamListType.EXAM_HISTORY_LIST.getValue().equals(examListType)) {
             return CacheConstants.EXAM_HISTORY_LIST;
+        } else {
+            return CacheConstants.USER_EXAM_LIST + userId;
         }
-        return "";
     }
 
     private String getDetailKey(Long examId) {

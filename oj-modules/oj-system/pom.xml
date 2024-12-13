@@ -30,6 +30,12 @@
             <version>${oj-common-redis.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>oj-common-core</artifactId>
+            <version>${oj-common-core.version}</version>
+        </dependency>
+
     </dependencies>
 
 

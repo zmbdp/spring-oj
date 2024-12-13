@@ -2,8 +2,11 @@ package com.zmbdp.common.security.interceptor;
 
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.util.StringUtil;
+import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.constants.HttpConstants;
+import com.zmbdp.common.core.utils.ThreadLocalUtil;
 import com.zmbdp.common.security.service.TokenService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +31,17 @@ public class TokenInterceptor implements HandlerInterceptor {
         if (StrUtil.isEmpty(token)) {
             return true;
         }
-        tokenService.extendToken(token, secret);
+        Claims claims = TokenService.getClaims(token, secret);
+        Long userId = tokenService.getUserId(claims);
+        // 身份认证都通过了，直接存到 ThreadLocal 中
+        ThreadLocalUtil.set(Constants.USER_ID, userId);
+        tokenService.extendToken(claims);
         return true;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        ThreadLocalUtil.remove();
     }
 
     // 从 request 中获取 token

@@ -30,6 +30,18 @@
             <version>${oj-common-core.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>oj-common-file</artifactId>
+            <version>${oj-common-file.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>oj-common-elsticsearch</artifactId>
+            <version>${oj-common-elsticsearch.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

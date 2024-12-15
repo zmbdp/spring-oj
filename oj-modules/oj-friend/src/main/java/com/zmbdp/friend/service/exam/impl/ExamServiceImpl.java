@@ -3,8 +3,10 @@ package com.zmbdp.friend.service.exam.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.common.core.service.BaseService;
+import com.zmbdp.common.core.utils.ThreadLocalUtil;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.friend.domain.exam.vo.ExamVO;
@@ -64,6 +66,21 @@ public class ExamServiceImpl extends BaseService implements IExamService {
             // 说明未查询到任何数据
             return TableDataInfo.empty();
         }
+        assembleExamVOList(examVOList);
         return TableDataInfo.success(examVOList, total);
+    }
+
+    private void assembleExamVOList(List<ExamVO> examVOList) {
+        // 从 ThreadLocal 中获取用户 id
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        List<Long> userExamIdList = examCacheManager.getAllUserExamList(userId);
+        if (CollectionUtil.isEmpty(userExamIdList)) {
+            return;
+        }
+        for (ExamVO examVO : examVOList) {
+            if (userExamIdList.contains(examVO.getExamId())) {
+                examVO.setEnter(true);
+            }
+        }
     }
 }

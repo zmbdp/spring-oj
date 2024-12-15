@@ -20,4 +20,6 @@ public class ExamVO {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime; // 竞赛结束时间
+
+    private boolean enter = false; //true: 已经报名  false 未报名
 }

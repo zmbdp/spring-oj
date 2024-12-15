@@ -49,6 +49,8 @@
         <oj-common-mybatis.version>1.0-SNAPSHOT</oj-common-mybatis.version>
         <oj-system.version>1.0-SNAPSHOT</oj-system.version>
         <oj-common-message.version>1.0-SNAPSHOT</oj-common-message.version>
+        <oj-common-file.version>1.0-SNAPSHOT</oj-common-file.version>
+        <oj-common-elsticsearch.version>1.0-SNAPSHOT</oj-common-elsticsearch.version>
     </properties>
 
     <dependencies>

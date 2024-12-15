@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zmbdp.common.core.constants.Constants;
-import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.common.core.enums.ExamListType;
@@ -14,7 +13,6 @@ import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.utils.ThreadLocalUtil;
 import com.zmbdp.common.security.service.TokenService;
 import com.zmbdp.friend.domain.exam.Exam;
-import com.zmbdp.friend.domain.exam.dto.ExamDTO;
 import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.friend.domain.exam.vo.ExamVO;
 import com.zmbdp.friend.domain.user.UserExam;
@@ -38,17 +36,12 @@ public class UserExamServiceImpl extends BaseService implements IUserExamService
     private ExamMapper examMapper;
 
     @Autowired
-    private TokenService tokenService;
-
-    @Autowired
     private ExamCacheManager examCacheManager;
-
-    @Value("${jwt.secret}")
-    private String secret;
 
     /**
      * 报名参赛 service 层
-     * @param token 用户的身份信息
+     *
+     * @param token  用户的身份信息
      * @param examId 竞赛 id
      * @return 是否成功报名
      */
@@ -70,14 +63,14 @@ public class UserExamServiceImpl extends BaseService implements IUserExamService
                 .selectOne(new LambdaQueryWrapper<UserExam>()
                         .eq(UserExam::getExamId, examId)
                         .eq(UserExam::getUserId, userId)
-        );
+                );
         if (userExam != null) {
             // 如果不为空，说明已经报过名了，直接返回不能重复报名
             return Result.fail(ResultCode.USER_EXAM_HAS_ENTER);
         }
         // 说明没报过名，直接添加到数据库 和 redis 中
         // 添加到 redis 中
-        examCacheManager.addUserExamCache(examId, userId);
+        examCacheManager.addUserExamCache(userId, examId);
         userExam = new UserExam();
         userExam.setExamId(examId);
         userExam.setUserId(userId);
@@ -86,8 +79,9 @@ public class UserExamServiceImpl extends BaseService implements IUserExamService
 
     @Override
     public TableDataInfo list(ExamQueryDTO examQueryDTO) {
+        examQueryDTO.setType(ExamListType.USER_EXAM_LIST.getValue());
         Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
-        Long total = examCacheManager.getListSize(ExamListType.USER_EXAM_LIST.getValue(), userId);
+        Long total = examCacheManager.getListSize(examQueryDTO.getType(), userId);
         List<ExamVO> examVOList;
         if (total == null || total <= 0) {
             // 说明从 redis 中未查询到数据，直接从数据库中查询就可以了
@@ -95,14 +89,14 @@ public class UserExamServiceImpl extends BaseService implements IUserExamService
             PageHelper.startPage(examQueryDTO.getPageNum(), examQueryDTO.getPageSize());
             examVOList = userExamMapper.selectUserExamList(userId);
             // 然后放到 redis 的缓存中
-            examCacheManager.refreshCache(ExamListType.USER_EXAM_LIST.getValue(), userId);
+            examCacheManager.refreshCache(examQueryDTO.getType(), userId);
             // 从数据库中查到的数据直接调用 page 插件赋值
             total = new PageInfo<>(examVOList).getTotal();
         } else {
             // 如果有的话直接拿到这部分数据
             examVOList = examCacheManager.getExamVOList(examQueryDTO, userId);
             // redis 中查数据的话直接就是 listSize，但是可能上一步出现问题，重新从数据库中刷新缓存了，这时候 size 就会改变
-            total = examCacheManager.getListSize(ExamListType.USER_EXAM_LIST.getValue(), userId);
+            total = examCacheManager.getListSize(examQueryDTO.getType(), userId);
         }
         if (CollectionUtil.isEmpty(examVOList)) {
             // 说明未查询到任何数据

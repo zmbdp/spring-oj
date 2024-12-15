@@ -29,6 +29,11 @@ public class UserExamController {
         return userExamService.enter(token, examDTO.getExamId());
     }
 
+    /**
+     * 我的竞赛列表数据查询
+     * @param examQueryDTO 用户信息
+     * @return 用户报名的所有竞赛
+     */
     @GetMapping("/list")
     public TableDataInfo list(ExamQueryDTO examQueryDTO) {
         return userExamService.list(examQueryDTO);

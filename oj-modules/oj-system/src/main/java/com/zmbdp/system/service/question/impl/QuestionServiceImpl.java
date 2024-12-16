@@ -14,13 +14,14 @@ import com.zmbdp.system.domain.question.Question;
 import com.zmbdp.system.domain.question.dto.QuestionAddDTO;
 import com.zmbdp.system.domain.question.dto.QuestionEditDTO;
 import com.zmbdp.system.domain.question.dto.QuestionQueryDTO;
+import com.zmbdp.system.domain.question.es.QuestionES;
 import com.zmbdp.system.domain.question.vo.QuestionDetailVO;
+import com.zmbdp.system.elasticsearch.QuestionRepository;
 import com.zmbdp.system.mapper.question.QuestionMapper;
 import com.zmbdp.system.service.question.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,15 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
     @Autowired
     private QuestionMapper questionMapper;
 
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    /**
+     * 查询题目列表 service 层
+     *
+     * @param questionQueryDTO 要求参数
+     * @return 题目列表
+     */
     @Override
     public TableDataInfo list(QuestionQueryDTO questionQueryDTO) {
         String excludeIdStr = questionQueryDTO.getExcludeIdStr();
@@ -47,6 +57,12 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         return getTableDataInfo(questionMapper.selectQuestionList(questionQueryDTO));
     }
 
+    /**
+     * 添加题目 service 层
+     *
+     * @param questionAddDTO 需要添加的题目信息
+     * @return 是否添加成功
+     */
     @Override
     public Result<Void> add(QuestionAddDTO questionAddDTO) {
         List<Question> questions = questionMapper.selectList(new LambdaQueryWrapper<Question>()
@@ -58,9 +74,23 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         Question question = new Question();
         // 把 questionAddDTO 转换成 question 对象，这样的话才会有创建人这些字段
         BeanUtil.copyProperties(questionAddDTO, question);
-        return toResult(questionMapper.insert(question));
+        int insert = questionMapper.insert(question);
+        if (insert <= 0) {
+            return Result.fail();
+        }
+        // 然后得维护 es
+        QuestionES questionES = new QuestionES();
+        BeanUtil.copyProperties(questionAddDTO, questionES);
+        questionRepository.save(questionES);
+        return Result.success();
     }
 
+    /**
+     * 题目详情查询 service 层
+     *
+     * @param questionId 需要查询的题目的 id
+     * @return 题目的信息
+     */
     @Override
     public Result<QuestionDetailVO> detail(Long questionId) {
         // 题目详情查询
@@ -75,9 +105,14 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         return Result.success(questionDetailVO);
     }
 
+    /**
+     * 编辑题目 service 层
+     *
+     * @param questionEditDTO 编辑好的题目信息
+     * @return 是否成功
+     */
     @Override
     public Result<Void> edit(QuestionEditDTO questionEditDTO) {
-        // 编辑字段，直接修改就行
         // 先看看是否存在
         Question question = questionMapper.selectById(questionEditDTO.getQuestionId());
         if (question == null) {
@@ -105,12 +140,20 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         return toResult(questionMapper.updateById(question));
         这样写太冗余了，直接下面这种写法更简便
         */
+        QuestionES questionES = new QuestionES();
+        BeanUtil.copyProperties(questionEditDTO, questionES);
+        questionRepository.save(questionES); // 维护 es
         return toResult(questionMapper.updateById(BeanUtil.copyProperties(questionEditDTO, Question.class)));
     }
 
+    /**
+     * 删除题目 service 层
+     *
+     * @param questionId 需要删除的题目的 id
+     * @return 是否删除成功
+     */
     @Override
     public Result<Void> delete(Long questionId) {
-        // 根据题目 id 删除题目
         // 先查询是否存在
         Question question = questionMapper.selectById(questionId);
         if (question == null) {
@@ -118,6 +161,7 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
             return Result.fail(ResultCode.FAILED_NOT_EXISTS);
         }
         // 存在的话就删除
+        questionRepository.deleteById(questionId); // 维护 es
         return toResult(questionMapper.deleteById(questionId));
     }
 }

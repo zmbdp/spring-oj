@@ -193,10 +193,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
         }
-        // 判断竞赛的开始时间如果说早于现在的时间，说明开赛了，不能操作
-        if (checkTime(exam) != null) {
-            return Result.fail(ResultCode.EXAM_STARTED);
-        }
+        // 并且还不允许编辑已发布的竞赛
         if (Constants.TRUE.equals(exam.getStatus())) {
             return Result.fail(ResultCode.EXAM_IS_PUBLISH);
         }

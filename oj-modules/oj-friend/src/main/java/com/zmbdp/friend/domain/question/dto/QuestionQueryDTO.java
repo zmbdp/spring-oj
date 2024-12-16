@@ -1,4 +1,4 @@
-package com.zmbdp.friend.domain.question;
+package com.zmbdp.friend.domain.question.dto;
 
 import com.zmbdp.common.core.domain.PageQueryDTO;
 import lombok.Data;

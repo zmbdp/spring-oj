@@ -1,0 +1,3 @@
+com.zmbdp.common.file.config.OSSConfig
+com.zmbdp.common.file.service.OSSService
+com.zmbdp.common.file.config.OSSProperties

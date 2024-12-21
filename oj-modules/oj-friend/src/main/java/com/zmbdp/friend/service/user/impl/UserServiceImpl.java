@@ -15,15 +15,21 @@ import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.enums.UserIdentity;
 import com.zmbdp.common.core.enums.UserStatus;
 import com.zmbdp.common.core.service.BaseService;
+import com.zmbdp.common.core.utils.ThreadLocalUtil;
 import com.zmbdp.common.message.service.AliSmsService;
 import com.zmbdp.common.redis.service.RedisService;
+import com.zmbdp.common.security.exception.ServiceException;
 import com.zmbdp.common.security.service.TokenService;
 import com.zmbdp.friend.domain.user.User;
 import com.zmbdp.friend.domain.user.dto.UserDTO;
+import com.zmbdp.friend.domain.user.dto.UserUpdateDTO;
+import com.zmbdp.friend.domain.user.vo.UserVO;
+import com.zmbdp.friend.manager.UserCacheManager;
 import com.zmbdp.friend.mapper.user.UserMapper;
 import com.zmbdp.friend.service.user.IUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -51,6 +57,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private UserCacheManager userCacheManager;
+
     @Value("${sms.code-expiration:5}")
     private Long phoneCodeExpiration;
 
@@ -63,6 +72,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Value("${jwt.secret}")
     private String secret;
+
+    @Value("${file.oss.downloadUrl}")
+    private String downloadUrl;
 
     /**
      * 判断是不是正常的手机号
@@ -142,7 +154,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
     @Override
     public Result<String> codeLogin(String phone, String code) {
         // 先比比验证码
-        Result<String> isCodeValid  = checkCode(phone, code);
+        Result<String> isCodeValid = checkCode(phone, code);
         if (isCodeValid != null) {
             return isCodeValid;
         }
@@ -152,9 +164,9 @@ public class UserServiceImpl extends BaseService implements IUserService {
         if (user == null) {
             // 说明是新用户，因为已经判断验证码是否正确了，所以直接添加到数据库中即可
             user = new User();
+            user.setCreateBy(Constants.SYSTEM_USER_ID);
             user.setPhone(phone);
             user.setNickName(UserConstants.DEFAULT_NICK_NAME);
-            user.setIntroduce(UserConstants.DEFAULT_INTRODUCE);
             user.setStatus(UserStatus.Normal.getValue());
             user.setHeadImage(UserConstants.DEFAULT_HEAD_IMAGE);
             userMapper.insert(user);
@@ -169,6 +181,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     /**
      * C端用户退出登录功能代码
+     *
      * @param token 令牌
      * @return 是否成功
      */
@@ -183,7 +196,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
 
     @Override
     public Result<LoginUserVO> info(String token) {
-        if (StringUtils.isEmpty(token) ) {
+        if (StringUtils.isEmpty(token)) {
             return Result.fail(ResultCode.ERROR);
         }
         if (StringUtils.isNotEmpty(token) && token.startsWith(HttpConstants.PREFIX)) {
@@ -195,8 +208,96 @@ public class UserServiceImpl extends BaseService implements IUserService {
         }
         LoginUserVO loginUserVO = new LoginUserVO();
         loginUserVO.setNickName(loginUser.getNickName());
-        loginUserVO.setHeadImage(loginUser.getHeadImage());
+        if (StringUtils.isNotEmpty(loginUser.getHeadImage())) {
+            loginUserVO.setHeadImage(downloadUrl + loginUser.getHeadImage());
+        }
         return Result.success(loginUserVO);
+    }
+
+    /**
+     * 获取用户信息的 service 层
+     *
+     * @return 用户的信息
+     */
+    @Override
+    public Result<UserVO> detail() {
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        if (userId == null) {
+            return Result.fail(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        // 从缓存当中拿到用户数据（在这里如果缓存中拿不到的话会操作数据库）
+        UserVO userVO = userCacheManager.getUserById(userId);
+        if (userVO == null) {
+            // 说明缓存和数据库都没有，就是没这个用户了
+            return Result.fail(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        // 看看头像是否为空，如果不为空就是设置了头像，直接拼接
+        if (StrUtil.isNotEmpty(userVO.getHeadImage())) {
+            userVO.setHeadImage(downloadUrl + userVO.getHeadImage());
+        }
+        return Result.success(userVO);
+    }
+
+    /**
+     * 编辑用户数据的 service 层
+     *
+     * @param userUpdateDTO 修改好的用户数据
+     * @return 是否修改成功
+     */
+    @Override
+    public Result<Void> edit(UserUpdateDTO userUpdateDTO) {
+        return getVoidResult(userUpdateDTO, null);
+    }
+
+    /**
+     * 更新头像 service 层
+     *
+     * @param headImage 更新的头像唯一标志
+     * @return 是否更新完成
+     */
+    @Override
+    public Result<Void> updateHeadImage(String headImage) {
+        return getVoidResult(null, headImage);
+    }
+
+    /**
+     * 更新用户数据
+     *
+     * @param userUpdateDTO 需要更新的用户数据
+     * @param headImage 用户头像
+     * @return 是否更新完成
+     */
+    private Result<Void> getVoidResult(UserUpdateDTO userUpdateDTO, String headImage) {
+        // 先拿到用户 id
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        if (userId == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        // 再从数据库里面查询是否有这个用户
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new ServiceException(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        if (headImage != null) {
+            // 不是空就更新头像
+            user.setHeadImage(headImage);
+        } else {
+            // 是空就更新用户数据，不能更新头像，因为返回过来的是完整的
+            user.setNickName(userUpdateDTO.getNickName());
+            user.setSex(userUpdateDTO.getSex());
+            user.setSchoolName(userUpdateDTO.getSchoolName());
+            user.setMajorName(userUpdateDTO.getMajorName());
+            user.setPhone(userUpdateDTO.getPhone());
+            user.setEmail(userUpdateDTO.getEmail());
+            user.setWechat(userUpdateDTO.getWechat());
+            user.setIntroduce(userUpdateDTO.getIntroduce());
+        }
+        // 更新用户缓存
+        userCacheManager.refreshUser(user);
+        tokenService.refreshLoginUser(user.getNickName(),user.getHeadImage(),
+                ThreadLocalUtil.get(Constants.USER_KEY, String.class));
+        // 更新数据库的数据
+        return toResult(userMapper.updateById(user));
     }
 
     @Nullable

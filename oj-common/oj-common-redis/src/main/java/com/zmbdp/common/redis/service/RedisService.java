@@ -283,4 +283,8 @@ public class RedisService {
     public Long deleteCacheMapValue(final String key, final String hKey) {
         return redisTemplate.opsForHash().delete(key, hKey);
     }
+
+    public Long incrementHashValue(final String key, final String hKey, long delta) {
+        return redisTemplate.opsForHash().increment(key, hKey, delta);
+    }
 }

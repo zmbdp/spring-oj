@@ -1,17 +1,22 @@
-package com.zmbdp.friend.service.question;
+package com.zmbdp.friend.service.question.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.util.StringUtil;
+import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
+import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.friend.domain.question.Question;
 import com.zmbdp.friend.domain.question.dto.QuestionQueryDTO;
 import com.zmbdp.friend.domain.question.es.QuestionES;
+import com.zmbdp.friend.domain.question.vo.QuestionDetailVO;
 import com.zmbdp.friend.elasticsearch.QuestionRepository;
 import com.zmbdp.friend.mapper.question.QuestionMapper;
+import com.zmbdp.friend.service.question.IQuestionService;
+import com.zmbdp.friend.domain.question.vo.QuestionVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,6 +77,39 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         return TableDataInfo.success(questionVoList, total);
     }
 
+    /**
+     * 获取题目信息的 service 层
+     *
+     * @param questionId 题目id
+     * @return 题目的信息
+     */
+    @Override
+    public Result<QuestionDetailVO> detail(Long questionId) {
+        // 先从 es 中看看能不能查到
+        QuestionES questionES = questionRepository.findById(questionId).orElse(null);
+        QuestionDetailVO questionDetailVO = new QuestionDetailVO();
+        if (questionES != null) {
+            // 如果能查到，直接赋给 vo
+            BeanUtil.copyProperties(questionES, questionDetailVO);
+            return Result.success(questionDetailVO);
+        }
+        // 如果查不到，再看看数据库里面有没有
+        Question question = questionMapper.selectById(questionId);
+        if (question == null) {
+            // 如果没有那就是真没有
+            return Result.fail(ResultCode.FAILED_NOT_EXISTS);
+        }
+        // 如果有的话同步 es 缓存
+        refreshQuestion();
+        // 然后再赋值给 vo
+        BeanUtil.copyProperties(question, questionDetailVO);
+        // 然后再返回
+        return Result.success(questionDetailVO);
+    }
+
+    /**
+     * es 缓存同步方法
+     */
     private void refreshQuestion() {
         List<Question> questions = questionMapper.selectList(new LambdaQueryWrapper<Question>());
         if (CollectionUtil.isEmpty(questions)) {

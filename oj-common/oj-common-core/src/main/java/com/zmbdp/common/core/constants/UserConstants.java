@@ -4,8 +4,7 @@ import java.util.UUID;
 
 public class UserConstants {
     public static final String DEFAULT_NICK_NAME = "LaatCode_" + generateNickName();
-    public static final String DEFAULT_INTRODUCE = "关于你的个性，兴趣或经验，展现自己独一档的强度...";
-    public static final String DEFAULT_HEAD_IMAGE = "/src/assets/images/headimage.jpg";
+    public static final String DEFAULT_HEAD_IMAGE = "default-head-image.jpg";
     // 生成16位的默认昵称
     public static String generateNickName() {
         // 生成一个UUID

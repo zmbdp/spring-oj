@@ -33,8 +33,10 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
         Claims claims = TokenService.getClaims(token, secret);
         Long userId = tokenService.getUserId(claims);
+        String userKey = tokenService.getUserKey(claims);
         // 身份认证都通过了，直接存到 ThreadLocal 中
         ThreadLocalUtil.set(Constants.USER_ID, userId);
+        ThreadLocalUtil.set(Constants.USER_KEY, userKey);
         tokenService.extendToken(claims);
         return true;
     }

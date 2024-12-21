@@ -46,6 +46,7 @@ public enum ResultCode {
 
     FAILED_FILE_UPLOAD(3401, "文件上传失败"),
     FAILED_FILE_UPLOAD_TIME_LIMIT(3402, "当天上传图片数量超过上限"),
+    FAILED_FILE_SIZE_EXCEEDED(3403, "上传文件大小超出限制，请上传小于 10MB 的文件"),
 
     FAILED_FIRST_QUESTION(3501, "当前题目已经是第一题了哦"),
     FAILED_LAST_QUESTION(3502, "当前题目已经是最后一题了哦"),

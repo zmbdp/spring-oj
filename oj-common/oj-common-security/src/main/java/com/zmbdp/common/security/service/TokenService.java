@@ -116,4 +116,12 @@ public class TokenService {
         String redisKey = getRedisKey(userKey);
         return redisService.deleteObject(redisKey);
     }
+
+    public void refreshLoginUser(String nickName, String headImage, String userKey) {
+        String tokenKey = getRedisKey(userKey);
+        LoginUser loginUser = redisService.getCacheObject(tokenKey, LoginUser.class);
+        loginUser.setNickName(nickName);
+        loginUser.setHeadImage(headImage);
+        redisService.setCacheObject(tokenKey, loginUser);
+    }
 }

@@ -113,7 +113,7 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
     }
 
     /**
-     * 获取上一题的service 层
+     * 获取上一题的 service 层
      *
      * @param questionId 题目id
      * @return 返回题目上一题的题目 id 给前端
@@ -130,7 +130,7 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
     }
 
     /**
-     * 获取下一题的service 层
+     * 获取下一题的 service 层
      *
      * @param questionId 题目id
      * @return 返回题目下一题的题目 id 给前端

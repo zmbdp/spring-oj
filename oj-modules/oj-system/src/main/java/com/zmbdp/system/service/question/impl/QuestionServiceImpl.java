@@ -134,7 +134,7 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
             // 说明数据库中题目存在了，不能添加
             return Result.fail(ResultCode.FAILED_ALREADY_EXISTS);
         }
-        /*
+        
         question.setTitle(questionEditDTO.getTitle());
         question.setDifficulty(questionEditDTO.getDifficulty());
         question.setTimeLimit(questionEditDTO.getTimeLimit());
@@ -143,13 +143,11 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         question.setQuestionCase(questionEditDTO.getQuestionCase());
         question.setDefaultCode(questionEditDTO.getDefaultCode());
         question.setMainFuc(questionEditDTO.getMainFuc());
-        return toResult(questionMapper.updateById(question));
-        这样写太冗余了，直接下面这种写法更简便
-        */
+
         QuestionES questionES = new QuestionES();
-        BeanUtil.copyProperties(questionEditDTO, questionES);
-        questionRepository.save(questionES); // 维护 es
-        return toResult(questionMapper.updateById(BeanUtil.copyProperties(questionEditDTO, Question.class)));
+        BeanUtil.copyProperties(question, questionES);
+        questionRepository.save(questionES);
+        return toResult(questionMapper.updateById(question));
     }
 
     /**

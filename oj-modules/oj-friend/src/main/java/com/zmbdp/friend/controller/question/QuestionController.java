@@ -38,4 +38,26 @@ public class QuestionController {
     public Result<QuestionDetailVO> detail(Long questionId) {
         return questionService.detail(questionId);
     }
+
+    /**
+     * 获取上一题信息接口
+     *
+     * @param questionId 题目id
+     * @return 上一题的题目信息
+     */
+    @GetMapping("/preQuestion")
+    public Result<String> preQuestion(Long questionId) {
+        return questionService.preQuestion(questionId);
+    }
+
+    /**
+     * 获取下一题信息接口
+     *
+     * @param questionId 题目id
+     * @return 下一题的题目id
+     */
+    @GetMapping("/nextQuestion")
+    public Result<String> nextQuestion(Long questionId) {
+        return questionService.nextQuestion(questionId);
+    }
 }

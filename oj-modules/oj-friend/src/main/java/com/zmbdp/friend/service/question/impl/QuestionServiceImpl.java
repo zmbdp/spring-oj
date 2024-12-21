@@ -14,6 +14,7 @@ import com.zmbdp.friend.domain.question.dto.QuestionQueryDTO;
 import com.zmbdp.friend.domain.question.es.QuestionES;
 import com.zmbdp.friend.domain.question.vo.QuestionDetailVO;
 import com.zmbdp.friend.elasticsearch.QuestionRepository;
+import com.zmbdp.friend.manager.QuestionCacheManager;
 import com.zmbdp.friend.mapper.question.QuestionMapper;
 import com.zmbdp.friend.service.question.IQuestionService;
 import com.zmbdp.friend.domain.question.vo.QuestionVo;
@@ -35,6 +36,9 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
     @Autowired
     private QuestionMapper questionMapper;
 
+    @Autowired
+    private QuestionCacheManager questionCacheManager;
+
     /**
      * c 端获取题目列表的 service 层
      *
@@ -43,9 +47,10 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
      */
     @Override
     public TableDataInfo list(QuestionQueryDTO questionQueryDTO) {
+        // 先从 es 里面查
         long count = questionRepository.count();
         if (count <= 0) {
-            // 然后就要从数据库中查
+            // 查不到就要从数据库中查
             refreshQuestion();
         }
         Sort sort = Sort.by(Sort.Direction.DESC, "createTime");
@@ -105,6 +110,40 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         BeanUtil.copyProperties(question, questionDetailVO);
         // 然后再返回
         return Result.success(questionDetailVO);
+    }
+
+    /**
+     * 获取上一题的service 层
+     *
+     * @param questionId 题目id
+     * @return 返回题目上一题的题目 id 给前端
+     */
+    @Override
+    public Result<String> preQuestion(Long questionId) {
+        // 先看看 redis 中是否有数据
+        Long listSize = questionCacheManager.getListSize();
+        if (listSize == null || listSize <= 0) {
+            // 如果没有就刷新缓存
+            questionCacheManager.refreshCache();
+        }
+        return Result.success(questionCacheManager.preQuestion(questionId).toString());
+    }
+
+    /**
+     * 获取下一题的service 层
+     *
+     * @param questionId 题目id
+     * @return 返回题目下一题的题目 id 给前端
+     */
+    @Override
+    public Result<String> nextQuestion(Long questionId) {
+        // 先看看 redis 中是否有数据
+        Long listSize = questionCacheManager.getListSize();
+        if (listSize == null || listSize <= 0) {
+            // 如果没有就刷新缓存
+            questionCacheManager.refreshCache();
+        }
+        return Result.success(questionCacheManager.nextQuestion(questionId).toString());
     }
 
     /**

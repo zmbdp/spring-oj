@@ -17,6 +17,7 @@ import com.zmbdp.system.domain.question.dto.QuestionQueryDTO;
 import com.zmbdp.system.domain.question.es.QuestionES;
 import com.zmbdp.system.domain.question.vo.QuestionDetailVO;
 import com.zmbdp.system.elasticsearch.QuestionRepository;
+import com.zmbdp.system.manager.QuestionCacheManager;
 import com.zmbdp.system.mapper.question.QuestionMapper;
 import com.zmbdp.system.service.question.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private QuestionCacheManager questionCacheManager;
 
     /**
      * 查询题目列表 service 层
@@ -80,8 +84,10 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         }
         // 然后得维护 es
         QuestionES questionES = new QuestionES();
-        BeanUtil.copyProperties(questionAddDTO, questionES);
+        BeanUtil.copyProperties(question, questionES);
         questionRepository.save(questionES);
+        // 还得放到缓存里面
+        questionCacheManager.addCache(question.getQuestionId());
         return Result.success();
     }
 
@@ -162,6 +168,8 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         }
         // 存在的话就删除
         questionRepository.deleteById(questionId); // 维护 es
+        // 维护 redis
+        questionCacheManager.deleteCache(questionId);
         return toResult(questionMapper.deleteById(questionId));
     }
 }

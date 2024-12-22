@@ -134,7 +134,7 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
             // 说明数据库中题目存在了，不能添加
             return Result.fail(ResultCode.FAILED_ALREADY_EXISTS);
         }
-        
+
         question.setTitle(questionEditDTO.getTitle());
         question.setDifficulty(questionEditDTO.getDifficulty());
         question.setTimeLimit(questionEditDTO.getTimeLimit());

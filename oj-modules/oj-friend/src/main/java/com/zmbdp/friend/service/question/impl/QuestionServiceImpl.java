@@ -89,27 +89,27 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
      * @return 题目的信息
      */
     @Override
-    public Result<QuestionDetailVO> detail(Long questionId) {
+    public QuestionDetailVO detail(Long questionId) {
         // 先从 es 中看看能不能查到
         QuestionES questionES = questionRepository.findById(questionId).orElse(null);
         QuestionDetailVO questionDetailVO = new QuestionDetailVO();
         if (questionES != null) {
             // 如果能查到，直接赋给 vo
             BeanUtil.copyProperties(questionES, questionDetailVO);
-            return Result.success(questionDetailVO);
+            return questionDetailVO;
         }
         // 如果查不到，再看看数据库里面有没有
         Question question = questionMapper.selectById(questionId);
         if (question == null) {
             // 如果没有那就是真没有
-            return Result.fail(ResultCode.FAILED_NOT_EXISTS);
+            return null;
         }
         // 如果有的话同步 es 缓存
         refreshQuestion();
         // 然后再赋值给 vo
         BeanUtil.copyProperties(question, questionDetailVO);
         // 然后再返回
-        return Result.success(questionDetailVO);
+        return questionDetailVO;
     }
 
     /**
@@ -119,14 +119,14 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
      * @return 返回题目上一题的题目 id 给前端
      */
     @Override
-    public Result<String> preQuestion(Long questionId) {
+    public String preQuestion(Long questionId) {
         // 先看看 redis 中是否有数据
         Long listSize = questionCacheManager.getListSize();
         if (listSize == null || listSize <= 0) {
             // 如果没有就刷新缓存
             questionCacheManager.refreshCache();
         }
-        return Result.success(questionCacheManager.preQuestion(questionId).toString());
+        return questionCacheManager.preQuestion(questionId).toString();
     }
 
     /**
@@ -136,14 +136,14 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
      * @return 返回题目下一题的题目 id 给前端
      */
     @Override
-    public Result<String> nextQuestion(Long questionId) {
+    public String nextQuestion(Long questionId) {
         // 先看看 redis 中是否有数据
         Long listSize = questionCacheManager.getListSize();
         if (listSize == null || listSize <= 0) {
             // 如果没有就刷新缓存
             questionCacheManager.refreshCache();
         }
-        return Result.success(questionCacheManager.nextQuestion(questionId).toString());
+        return questionCacheManager.nextQuestion(questionId).toString();
     }
 
     /**

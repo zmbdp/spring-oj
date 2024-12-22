@@ -105,7 +105,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         }
         // 看看这些题目存不存在
         List<Question> questionList = questionMapper.selectBatchIds(questionIdSet);
-        if (CollectionUtil.isEmpty(questionList) || questionList.size() < examQuestionAddDTO.getQuestionIdSet().size()) {
+        if (CollectionUtil.isEmpty(questionList) || questionList.size() < questionIdSet.size()) {
             return Result.fail(ResultCode.EXAM_QUESTION_NOT_EXISTS);
         }
 
@@ -125,11 +125,6 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         Exam exam = getExam(examId);
         if (exam == null) {
             return Result.fail(ResultCode.EXAM_NOT_EXISTS);
-        }
-        // 再判断题目是否存在
-        // 然后再查询一下看看这些 题目 是否存在
-        if (questionMapper.selectById(questionId) == null) {
-            return Result.fail(ResultCode.EXAM_QUESTION_NOT_EXISTS);
         }
         // 校验时间
         Result<Void> validationResult = checkTime(exam);
@@ -279,7 +274,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         }
         // 校验时间
         Result<Void> validationResult = checkTime(exam);
-        if (validationResult  != null) {
+        if (validationResult != null) {
             return validationResult ;
         }
         exam.setStatus(Constants.FALSE);

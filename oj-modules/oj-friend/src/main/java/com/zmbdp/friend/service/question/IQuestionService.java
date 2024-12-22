@@ -8,9 +8,9 @@ import com.zmbdp.friend.domain.question.vo.QuestionDetailVO;
 public interface IQuestionService {
     TableDataInfo list(QuestionQueryDTO questionQueryDTO);
 
-    Result<QuestionDetailVO> detail(Long questionId);
+    QuestionDetailVO detail(Long questionId);
 
-    Result<String> preQuestion(Long questionId);
+    String preQuestion(Long questionId);
 
-    Result<String> nextQuestion(Long questionId);
+    String nextQuestion(Long questionId);
 }

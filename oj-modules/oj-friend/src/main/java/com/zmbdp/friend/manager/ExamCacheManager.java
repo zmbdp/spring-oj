@@ -12,21 +12,25 @@ import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.common.security.exception.ServiceException;
 import com.zmbdp.friend.domain.exam.Exam;
+import com.zmbdp.friend.domain.exam.ExamQuestion;
 import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.friend.domain.exam.dto.ExamRankDTO;
 import com.zmbdp.friend.domain.exam.vo.ExamRankVO;
 import com.zmbdp.friend.domain.exam.vo.ExamVO;
 import com.zmbdp.friend.domain.user.UserExam;
 import com.zmbdp.friend.mapper.exam.ExamMapper;
+import com.zmbdp.friend.mapper.exam.ExamQuestionMapper;
 import com.zmbdp.friend.mapper.user.UserExamMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
@@ -40,6 +44,9 @@ public class ExamCacheManager {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private ExamQuestionMapper examQuestionMapper;
 
     public Long getListSize(Integer examListType, Long userId) {
         String examListKey = getExamListKey(examListType, userId);
@@ -123,7 +130,7 @@ public class ExamCacheManager {
         return redisService.indexForList(getExamQuestionListKey(examId), index + 1, Long.class);
     }
 
-    //刷新缓存逻辑
+    // 刷新题目列表缓存
     public void refreshCache(Integer examListType, Long userId) {
         List<Exam> examList = new ArrayList<>();
         if (ExamListType.EXAM_UN_FINISH_LIST.getValue().equals(examListType)) {
@@ -159,6 +166,23 @@ public class ExamCacheManager {
         redisService.multiSet(examMap);
         redisService.deleteObject(getExamListKey(examListType, userId));
         redisService.rightPushAll(getExamListKey(examListType, userId), examIdList);
+    }
+
+    // 刷新竞赛题目列表缓存
+    public void refreshExamQuestionCache(Long examId) {
+        List<ExamQuestion> examQuestionList = examQuestionMapper.selectList(new LambdaQueryWrapper<ExamQuestion>()
+                .select(ExamQuestion::getQuestionId)
+                .eq(ExamQuestion::getExamId, examId)
+                .orderByAsc(ExamQuestion::getQuestionOrder));
+        if (CollectionUtil.isEmpty(examQuestionList)) {
+            return;
+        }
+        List<Long> examQuestionIdList = examQuestionList.stream().map(ExamQuestion::getQuestionId).toList();
+        redisService.rightPushAll(getExamQuestionListKey(examId), examQuestionIdList);
+        // 节省 redis 缓存资源
+        long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(),
+                LocalDateTime.now().plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0));
+        redisService.expire(getExamQuestionListKey(examId), seconds, TimeUnit.SECONDS);
     }
 
     private List<ExamVO> getExamListByDB(ExamQueryDTO examQueryDTO, Long userId) {

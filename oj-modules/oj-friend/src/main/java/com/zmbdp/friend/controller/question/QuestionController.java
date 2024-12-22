@@ -36,7 +36,7 @@ public class QuestionController {
      */
     @GetMapping("/detail")
     public Result<QuestionDetailVO> detail(Long questionId) {
-        return questionService.detail(questionId);
+        return Result.success(questionService.detail(questionId));
     }
 
     /**
@@ -47,7 +47,7 @@ public class QuestionController {
      */
     @GetMapping("/preQuestion")
     public Result<String> preQuestion(Long questionId) {
-        return questionService.preQuestion(questionId);
+        return Result.success(questionService.preQuestion(questionId));
     }
 
     /**
@@ -58,6 +58,6 @@ public class QuestionController {
      */
     @GetMapping("/nextQuestion")
     public Result<String> nextQuestion(Long questionId) {
-        return questionService.nextQuestion(questionId);
+        return Result.success(questionService.nextQuestion(questionId));
     }
 }

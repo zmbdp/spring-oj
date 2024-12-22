@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zmbdp.common.core.constants.Constants;
+import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.utils.ThreadLocalUtil;
@@ -68,6 +69,59 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         }
         assembleExamVOList(examVOList);
         return TableDataInfo.success(examVOList, total);
+    }
+
+    /**
+     * 获取竞赛中第一题的 service 层
+     *
+     * @param examId 竞赛 id
+     * @return 第一题的题目 id
+     */
+    @Override
+    public String getFirstQuestion(Long examId) {
+        // 先判断缓存是否有数据
+        checkAndRefresh(examId);
+        // 然后直接返回缓存当中的数据
+        return examCacheManager.getFirstQuestion(examId).toString();
+    }
+
+    /**
+     * 获取上一题 id 的 service 层
+     *
+     * @param examId 竞赛 id
+     * @param questionId 题目 id
+     * @return 上一题的题目 id
+     */
+    @Override
+    public String preQuestion(Long examId, Long questionId) {
+        // 先判断缓存是否有数据
+        checkAndRefresh(examId);
+        // 然后直接返回缓存中的数据
+        return examCacheManager.preQuestion(examId, questionId).toString();
+    }
+
+    /**
+     * 获取下一题 id 的 service 层
+     *
+     * @param examId 竞赛 id
+     * @param questionId 题目 id
+     * @return 下一题的题目 id
+     */
+    @Override
+    public String nextQuestion(Long examId, Long questionId) {
+        // 先判断缓存是否有数据
+        checkAndRefresh(examId);
+        // 然后直接返回缓存中的数据
+        return examCacheManager.nextQuestion(examId, questionId).toString();
+    }
+
+    private void checkAndRefresh(Long examId) {
+        // 先判断缓存是否有数据
+        Long listSize = examCacheManager.getExamQuestionListSize(examId);
+        if (listSize == null || listSize <= 0) {
+            // 如果没有就刷新缓存
+            examCacheManager.refreshExamQuestionCache(examId);
+        }
     }
 
     private void assembleExamVOList(List<ExamVO> examVOList) {

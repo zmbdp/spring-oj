@@ -113,6 +113,13 @@ public class ExamCacheManager {
         return redisService.indexForList(getExamQuestionListKey(examId), 0, Long.class);
     }
 
+    /**
+     * 获取上一题的
+     *
+     * @param examId 竞赛 id
+     * @param questionId 题目 id
+     * @return 上一题的 id
+     */
     public Long preQuestion(Long examId, Long questionId) {
         Long index = redisService.indexOfForList(getExamQuestionListKey(examId), questionId);
         if (index == 0) {
@@ -121,6 +128,13 @@ public class ExamCacheManager {
         return redisService.indexForList(getExamQuestionListKey(examId), index - 1, Long.class);
     }
 
+    /**
+     * 获取下一题
+     *
+     * @param examId 竞赛 id
+     * @param questionId 题目 id
+     * @return 下一题的 id
+     */
     public Long nextQuestion(Long examId, Long questionId) {
         Long index = redisService.indexOfForList(getExamQuestionListKey(examId), questionId);
         long lastIndex = getExamQuestionListSize(examId) - 1;

@@ -22,6 +22,7 @@
         <module>oj-common</module>
         <module>oj-gateway</module>
         <module>oj-common/oj-common-message</module>
+        <module>oj-api</module>
     </modules>
 
     <properties>
@@ -55,6 +56,7 @@
         <oj-common-message.version>1.0-SNAPSHOT</oj-common-message.version>
         <oj-common-file.version>1.0-SNAPSHOT</oj-common-file.version>
         <oj-common-elsticsearch.version>1.0-SNAPSHOT</oj-common-elsticsearch.version>
+        <oj-api.version>1.0-SNAPSHOT</oj-api.version>
     </properties>
 
     <dependencies>

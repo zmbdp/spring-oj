@@ -44,8 +44,8 @@
 
         <dependency>
             <groupId>com.zmbdp</groupId>
-            <artifactId>oj-common-file</artifactId>
-            <version>${oj-common-file.version}</version>
+            <artifactId>oj-api</artifactId>
+            <version>${oj-api.version}</version>
         </dependency>
 
     </dependencies>

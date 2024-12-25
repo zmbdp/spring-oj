@@ -54,6 +54,7 @@ public class UserQuestionServiceImpl implements IUserQuestionService {
         if (ProgramType.JAVA.getValue().equals(programType)) {
             // 按照 java 逻辑处理
             JudgeSubmitDTO judgeSubmitDTO = assembleJudgeSubmitDTO(submitDTO);
+            // 拿到了执行所需要的参数之后再执行 service
             return remoteJudgeService.doJudgeJavaCode(judgeSubmitDTO);
         }
         throw new ServiceException(ResultCode.FAILED_NOT_SUPPORT_PROGRAM);
@@ -67,14 +68,18 @@ public class UserQuestionServiceImpl implements IUserQuestionService {
      */
     private JudgeSubmitDTO assembleJudgeSubmitDTO(UserSubmitDTO submitDTO) {
         Long questionId = submitDTO.getQuestionId();
+        // 先查询 es 当中的数据
         QuestionES questionES = questionRepository.findById(questionId).orElse(null);
         JudgeSubmitDTO judgeSubmitDTO = new JudgeSubmitDTO();
         if (questionES != null) {
+            // 如果不是空就赋值
             BeanUtil.copyProperties(questionES, judgeSubmitDTO);
         } else {
+            // 如果是空就从数据库种查，查到了再把数据库中的赋值
             Question question = questionMapper.selectById(questionId);
             BeanUtil.copyProperties(question, judgeSubmitDTO);
             questionES = new QuestionES();
+            // 然后更新 es
             BeanUtil.copyProperties(question, questionES);
             questionRepository.save(questionES);
         }

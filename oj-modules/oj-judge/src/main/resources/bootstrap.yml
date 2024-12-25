@@ -1,7 +1,16 @@
-server:
-  port: 8083
-
 # 配置 spring 项目的名字
 spring:
   application:
     name: oj-judge
+  profiles:
+    active: local
+  cloud:
+    nacos:
+      discovery:
+        namespace: 36b68d32-32ff-460e-80ad-9231f1251d10
+        server-addr: http://127.0.0.1:8848
+      config:
+        namespace: 36b68d32-32ff-460e-80ad-9231f1251d10
+        server-addr: http://127.0.0.1:8848
+        file-extension: yaml
+

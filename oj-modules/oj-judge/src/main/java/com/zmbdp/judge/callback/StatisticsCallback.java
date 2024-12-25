@@ -35,13 +35,13 @@ public class StatisticsCallback implements ResultCallback<Statistics> {
 
     }
 
-    //这个方法在所有的统计信息都被接收完毕后调用
+    // 这个方法在所有的统计信息都被接收完毕后调用
     @Override
     public void onComplete() {
 
     }
 
-    //这个方法用于清理资源
+    // 这个方法用于清理资源
     @Override
     public void close() throws IOException {
 

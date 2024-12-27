@@ -1,6 +1,7 @@
 package com.zmbdp.judge.service.impl;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -17,6 +18,7 @@ import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.constants.JudgeConstants;
 import com.zmbdp.common.core.enums.CodeRunStatus;
 import com.zmbdp.judge.callback.DockerStartResultCallback;
+import com.zmbdp.judge.callback.StatisticsCallback;
 import com.zmbdp.judge.domain.CompileResult;
 import com.zmbdp.judge.domain.SandBoxExecuteResult;
 import com.zmbdp.judge.service.ISandboxService;
@@ -24,9 +26,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class SandboxServiceImpl implements ISandboxService {
@@ -74,14 +79,14 @@ public class SandboxServiceImpl implements ISandboxService {
             deleteUserCodeFile();
             return SandBoxExecuteResult.fail(CodeRunStatus.COMPILE_FAILED, compileResult.getExeMessage());
         }
-        // 执行代码
+        // 说明编译成功，得执行代码了
         return executeJavaCodeByDocker(inputList);
     }
 
     /**
      * 把用户的代码写入到文件中
      *
-     * @param userId 用户 id
+     * @param userId   用户 id
      * @param userCode 用户代码
      */
     private void createUserCodeFile(Long userId, String userCode) {
@@ -184,6 +189,53 @@ public class SandboxServiceImpl implements ISandboxService {
     }
 
     /**
+     * 执行代码逻辑
+     *
+     * @param inputList 输入列表
+     * @return
+     */
+    private SandBoxExecuteResult executeJavaCodeByDocker(List<String> inputList) {
+        List<String> outList = new ArrayList<>(); //记录输出结果
+        long maxMemory = 0L;  //最大占用内存
+        long maxUseTime = 0L; //最大运行时间
+        //执行用户代码
+        for (String inputArgs : inputList) {
+            String cmdId = createExecCmd(JudgeConstants.DOCKER_JAVA_EXEC_CMD, inputArgs, containerId);
+            // 执行代码
+            StopWatch stopWatch = new StopWatch(); // 执行代码后开始计时
+            // 执行情况监控
+            StatsCmd statsCmd = dockerClient.statsCmd(containerId); // 启动监控
+            StatisticsCallback statisticsCallback = statsCmd.exec(new StatisticsCallback());
+            stopWatch.start();
+            DockerStartResultCallback resultCallback = new DockerStartResultCallback();
+            try {
+                dockerClient.execStartCmd(cmdId)
+                        .exec(resultCallback)
+                        .awaitCompletion(timeLimit, TimeUnit.SECONDS);
+                if (CodeRunStatus.FAILED.equals(resultCallback.getCodeRunStatus())) {
+                    // 未通过所有用例返回结果
+                    return SandBoxExecuteResult.fail(CodeRunStatus.NOT_ALL_PASSED);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            stopWatch.stop(); // 结束时间统计
+            statsCmd.close(); // 结束 docker 容器执行统计
+            long userTime = stopWatch.getLastTaskTimeMillis(); // 执行耗时
+            maxUseTime = Math.max(userTime, maxUseTime);       // 记录最大的执行用例耗时
+            Long memory = statisticsCallback.getMaxMemory();
+            if (memory != null) {
+                maxMemory = Math.max(maxMemory, statisticsCallback.getMaxMemory()); // 记录最大的执行用例占用内存
+            }
+            outList.add(resultCallback.getMessage().trim());   // 记录正确的输出结果
+        }
+        deleteContainer(); // 删除容器
+        deleteUserCodeFile(); // 清理文件
+
+        return getSanBoxResult(inputList, outList, maxMemory, maxUseTime); // 封装结果
+    }
+
+    /**
      * 执行 Java 代码
      *
      * @param javaCmdArr
@@ -204,5 +256,44 @@ public class SandboxServiceImpl implements ISandboxService {
                 .withAttachStdout(true)
                 .exec();
         return cmdResponse.getId();
+    }
+
+    /**
+     * 封装结果
+     *
+     * @param inputList 输入列表
+     * @param outList 输出列表
+     * @param maxMemory 最大空间
+     * @param maxUseTime 最大时间
+     * @return 封装完成之后的结果
+     */
+    private SandBoxExecuteResult getSanBoxResult(List<String> inputList, List<String> outList, long maxMemory, long maxUseTime) {
+        if (inputList.size() != outList.size()) {
+            // 输入用例数量 不等于 输出用例数量  属于执行异常
+            return SandBoxExecuteResult.fail(CodeRunStatus.NOT_ALL_PASSED, outList, maxMemory, maxUseTime);
+        }
+        return SandBoxExecuteResult.success(CodeRunStatus.SUCCEED, outList, maxMemory, maxUseTime);
+    }
+
+    /**
+     * 删除 docker 容器
+     */
+    private void deleteContainer() {
+        // 执行完成之后删除容器
+        dockerClient.stopContainerCmd(containerId).exec();
+        dockerClient.removeContainerCmd(containerId).exec();
+        // 断开和 docker 连接
+        try {
+            dockerClient.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 删除代码文件
+     */
+    private void deleteUserCodeFile() {
+        FileUtil.del(userCodeDir);
     }
 }

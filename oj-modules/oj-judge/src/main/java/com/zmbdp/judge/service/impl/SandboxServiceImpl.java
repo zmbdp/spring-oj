@@ -194,7 +194,7 @@ public class SandboxServiceImpl implements ISandboxService {
     private String createExecCmd(String[] javaCmdArr, String inputArgs, String containerId) {
         if (!StrUtil.isEmpty(inputArgs)) {
             // 当入参不为空时拼接入参
-            String[] inputArray = inputArgs.split(" "); //入参
+            String[] inputArray = inputArgs.split(" "); // 入参
             javaCmdArr = ArrayUtil.append(JudgeConstants.DOCKER_JAVA_EXEC_CMD, inputArray);
         }
         ExecCreateCmdResponse cmdResponse = dockerClient.execCreateCmd(containerId)

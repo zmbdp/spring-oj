@@ -2,6 +2,8 @@ package com.zmbdp.judge.service.impl;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.*;
 import com.github.dockerjava.api.model.Bind;
@@ -14,6 +16,7 @@ import com.github.dockerjava.netty.NettyDockerCmdExecFactory;
 import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.constants.JudgeConstants;
 import com.zmbdp.common.core.enums.CodeRunStatus;
+import com.zmbdp.judge.callback.DockerStartResultCallback;
 import com.zmbdp.judge.domain.CompileResult;
 import com.zmbdp.judge.domain.SandBoxExecuteResult;
 import com.zmbdp.judge.service.ISandboxService;
@@ -154,5 +157,52 @@ public class SandboxServiceImpl implements ISandboxService {
         hostConfig.withNetworkMode("none"); // 禁用网络
         hostConfig.withReadonlyRootfs(true); // 禁止在 root 目录写文件
         return hostConfig;
+    }
+
+    // 编译
+    // 的使用 docker 编译
+    private CompileResult compileCodeByDocker() {
+        // 先执行 Java 代码
+        String cmdId = createExecCmd(JudgeConstants.DOCKER_JAVAC_CMD, null, containerId);
+        DockerStartResultCallback resultCallback = new DockerStartResultCallback();
+        CompileResult compileResult = new CompileResult();
+        try {
+            dockerClient.execStartCmd(cmdId)
+                    .exec(resultCallback)
+                    .awaitCompletion();
+            if (CodeRunStatus.FAILED.equals(resultCallback.getCodeRunStatus())) {
+                compileResult.setCompiled(false);
+                compileResult.setExeMessage(resultCallback.getErrorMessage());
+            } else {
+                compileResult.setCompiled(true);
+            }
+            return compileResult;
+        } catch (InterruptedException e) {
+            // 此处可以直接抛出 已做统一异常处理  也可再做定制化处理
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 执行 Java 代码
+     *
+     * @param javaCmdArr
+     * @param inputArgs
+     * @param containerId
+     * @return
+     */
+    private String createExecCmd(String[] javaCmdArr, String inputArgs, String containerId) {
+        if (!StrUtil.isEmpty(inputArgs)) {
+            // 当入参不为空时拼接入参
+            String[] inputArray = inputArgs.split(" "); //入参
+            javaCmdArr = ArrayUtil.append(JudgeConstants.DOCKER_JAVA_EXEC_CMD, inputArray);
+        }
+        ExecCreateCmdResponse cmdResponse = dockerClient.execCreateCmd(containerId)
+                .withCmd(javaCmdArr)
+                .withAttachStderr(true)
+                .withAttachStdin(true)
+                .withAttachStdout(true)
+                .exec();
+        return cmdResponse.getId();
     }
 }

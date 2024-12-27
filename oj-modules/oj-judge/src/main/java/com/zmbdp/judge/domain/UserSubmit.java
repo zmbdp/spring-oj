@@ -23,11 +23,11 @@ public class UserSubmit extends BaseEntity {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long submitId;
 
-    private Long userId; // 唯一确定用户     2001/2002
+    private Long userId; // 唯一确定用户
 
-    private Long questionId;  // 唯一确定题目  100      100     102
+    private Long questionId; // 唯一确定题目
 
-    private Long examId;   // 唯一确定竞赛      1       2          3   4    null
+    private Long examId; // 唯一确定竞赛
 
     private Integer programType;
 

@@ -60,8 +60,9 @@ public class SandboxServiceImpl implements ISandboxService {
      */
     @Override
     public SandBoxExecuteResult exeJavaCode(Long userId, String userCode, List<String> inputList) {
-        // 创建Java文件
+        // 创建 Java 文件
         createUserCodeFile(userId, userCode);
+        // 初始化 docker 沙箱
         initDockerSanBox();
         // 编译代码
         CompileResult compileResult = compileCodeByDocker();
@@ -93,6 +94,9 @@ public class SandboxServiceImpl implements ISandboxService {
         FileUtil.writeString(userCode, userCodeFileName, Constants.UTF8);
     }
 
+    /**
+     * 初始化 docker 沙箱
+     */
     private void initDockerSanBox() {
         DefaultDockerClientConfig clientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(dockerHost)
@@ -114,7 +118,7 @@ public class SandboxServiceImpl implements ISandboxService {
                 .withAttachStdout(true)
                 .withTty(true)
                 .exec();
-        // 记录容器id
+        // 记录容器 id
         containerId = createContainerResponse.getId();
         // 启动容器
         dockerClient.startContainerCmd(containerId).exec();
@@ -148,7 +152,7 @@ public class SandboxServiceImpl implements ISandboxService {
         hostConfig.withMemorySwap(memorySwapLimit);
         hostConfig.withCpuCount(cpuLimit);
         hostConfig.withNetworkMode("none"); // 禁用网络
-        hostConfig.withReadonlyRootfs(true); // 禁止在root目录写文件
+        hostConfig.withReadonlyRootfs(true); // 禁止在 root 目录写文件
         return hostConfig;
     }
 }

@@ -16,5 +16,5 @@ public class UserQuestionResultVO {
     private List<UserExeResult> userExeResultList; // 测试用例的输出
 
     @JsonIgnore
-    private Integer score; //
+    private Integer score; // 得分
 }

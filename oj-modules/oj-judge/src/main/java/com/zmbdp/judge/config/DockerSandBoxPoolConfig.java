@@ -29,12 +29,17 @@ public class DockerSandBoxPoolConfig {
     @Value("${sandbox.limit.cpu:1}")
     private Long cpuLimit;
 
-    @Value("${sandbox.docker.pool.size:4}")
+    @Value("${sandbox.docker.pool.size:5}")
     private int poolSize;
 
     @Value("${sandbox.docker.name-prefix:oj-sandbox-jdk}")
     private String containerNamePrefix;
 
+    /**
+     * 创建并返回一个 DockerClient 实例
+     *
+     * @return DockerClient 实例
+     */
     @Bean
     public DockerClient createDockerClient() {
         DefaultDockerClientConfig clientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
@@ -46,6 +51,12 @@ public class DockerSandBoxPoolConfig {
                 .build();
     }
 
+    /**
+     * 创建并初始化一个 Docker 沙箱池
+     *
+     * @param dockerClient 管理 Docker 容器和镜像
+     * @return 时间啊空间啊这些参数
+     */
     @Bean
     public DockerSandBoxPool createDockerSandBoxPool(DockerClient dockerClient) {
         DockerSandBoxPool dockerSandBoxPool = new DockerSandBoxPool(dockerClient, sandboxImage, volumeDir, memoryLimit,

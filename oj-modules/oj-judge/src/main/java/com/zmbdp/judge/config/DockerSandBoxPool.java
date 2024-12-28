@@ -42,7 +42,7 @@ public class DockerSandBoxPool {
 
     private String containerNamePrefix;
 
-    private BlockingQueue<String> containerQueue;
+    private BlockingQueue<String> containerQueue; // 阻塞队列的容器池
 
     private Map<String, String> containerNameMap;
 
@@ -63,7 +63,7 @@ public class DockerSandBoxPool {
         this.containerNameMap = new HashMap<>();
     }
 
-    public void initDockerPool() {  // 初始化容器池的
+    public void initDockerPool() { // 初始化容器池的
         log.info("--------  创建容器开始  -------");
         for(int i = 0; i < poolSize; i++) {
             createContainer(containerNamePrefix + "-" + i);
@@ -71,6 +71,11 @@ public class DockerSandBoxPool {
         log.info("--------  创建容器结束  -------");
     }
 
+    /**
+     * 获取容器
+     *
+     * @return 容器名字
+     */
     public String getContainer() {
         try {
             return containerQueue.take();
@@ -79,6 +84,11 @@ public class DockerSandBoxPool {
         }
     }
 
+    /**
+     * 返还容器
+     *
+     * @param containerId 要返还的容器的 id
+     */
     public void returnContainer(String containerId) {
         containerQueue.add(containerId);
     }
@@ -91,9 +101,10 @@ public class DockerSandBoxPool {
                 String[] containerNames = container.getNames();
                 if (containerNames != null && containerNames.length > 0 && names.equals(containerNames[0])) {
                     if ("created".equals(container.getState()) || "exited".equals(container.getState())) {
-                        //启动容器
+                        // 启动容器
                         dockerClient.startContainerCmd(container.getId()).exec();
                     }
+                    // 添加到 容器池 中
                     containerQueue.add(container.getId());
                     containerNameMap.put(container.getId(), containerName);
                     return;
@@ -101,9 +112,9 @@ public class DockerSandBoxPool {
             }
         }
 
-        //拉取镜像
+        // 拉取镜像
         pullJavaEnvImage();
-        //创建容器  限制资源   控制权限
+        // 创建容器  限制资源  控制权限
         HostConfig hostConfig = getHostConfig(containerName);
         CreateContainerCmd containerCmd = dockerClient
                 .createContainerCmd(JudgeConstants.JAVA_ENV_IMAGE)
@@ -114,9 +125,9 @@ public class DockerSandBoxPool {
                 .withAttachStdout(true)
                 .withTty(true)
                 .exec();
-        //记录容器id
+        // 记录容器id
         String containerId = createContainerResponse.getId();
-        //启动容器
+        // 启动容器
         dockerClient.startContainerCmd(containerId).exec();
         containerQueue.add(containerId);
         containerNameMap.put(containerId, containerName);
@@ -139,18 +150,18 @@ public class DockerSandBoxPool {
         }
     }
 
-    //限制资源   控制权限
+    // 限制资源  控制权限
     private HostConfig getHostConfig(String containerName) {
         HostConfig hostConfig = new HostConfig();
-        //设置挂载目录，指定用户代码路径
+        // 设置挂载目录，指定用户代码路径
         String userCodeDir = createContainerDir(containerName);
         hostConfig.setBinds(new Bind(userCodeDir, new Volume(volumeDir)));
-        //限制docker容器使用资源
+        // 限制 docker 容器使用资源
         hostConfig.withMemory(memoryLimit);
         hostConfig.withMemorySwap(memorySwapLimit);
         hostConfig.withCpuCount(cpuLimit);
-        hostConfig.withNetworkMode("none");  //禁用网络
-        hostConfig.withReadonlyRootfs(true); //禁止在root目录写文件
+        hostConfig.withNetworkMode("none");  // 禁用网络
+        hostConfig.withReadonlyRootfs(true); // 禁止在root目录写文件
         return hostConfig;
     }
 
@@ -160,9 +171,9 @@ public class DockerSandBoxPool {
         return System.getProperty("user.dir") + File.separator + JudgeConstants.CODE_DIR_POOL + File.separator + containerName;
     }
 
-    //为每个容器，创建的指定挂载文件
+    // 为每个容器，创建的指定挂载文件
     private String createContainerDir(String containerName) {
-        //一级目录  存放所有容器的挂载目录
+        // 一级目录  存放所有容器的挂载目录
         String codeDir = System.getProperty("user.dir") + File.separator + JudgeConstants.CODE_DIR_POOL;
         if (!FileUtil.exist(codeDir)) {
             FileUtil.mkdir(codeDir);

@@ -22,7 +22,8 @@ create table tb_sys_user
 ) engine = innodb default character set = utf8mb4 comment = '管理员的用户表';
 
 insert into spring_oj_dev.tb_sys_user (user_id, user_account, password, create_by, create_time, update_by, update_time)
-values (522399972612771842, 'zhangsan', '$2a$10$Nqf804r/D6jyF8A2rUlqZOsgEHcarQ1v/tX6OQIu3QSBnDVBAtb4u', 0, '2024-11-07 10:30:00', 0,
+values (522399972612771842, 'zhangsan', '$2a$10$Nqf804r/D6jyF8A2rUlqZOsgEHcarQ1v/tX6OQIu3QSBnDVBAtb4u', 0,
+        '2024-11-07 10:30:00', 0,
         '2024-11-07 10:30:00');
 
 -- 关于题库的管理表
@@ -162,13 +163,13 @@ create table tb_user_submit
     user_id      bigint unsigned not null comment '用户id',
     question_id  bigint unsigned not null comment '题目id',
     exam_id      bigint unsigned  comment '竞赛id',
-    program_type tinyint       not null comment '代码类型 0 java   1 cpp',
-    user_code    text          not null comment '用户代码',
-    pass         tinyint       not null comment '0：未通过  1：通过',
-    exe_message  varchar(1024) not null comment '执行结果',
-    score        int           not null default '0' comment '得分',
+    program_type tinyint  not null comment '代码类型 0 java   1 cpp',
+    user_code    text     not null comment '用户代码',
+    pass         tinyint  not null comment '0：未通过  1：通过',
+    exe_message  varchar(1024) comment '执行结果',
+    score        int      not null default '0' comment '得分',
     create_by    bigint unsigned not null  comment '创建人',
-    create_time  datetime      not null comment '创建时间',
+    create_time  datetime not null comment '创建时间',
     update_by    bigint unsigned  comment '更新人',
     update_time  datetime comment '更新时间',
     primary key (`submit_id`)

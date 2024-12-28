@@ -166,6 +166,7 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
         userSubmit.setExamId(judgeSubmitDTO.getExamId());
         userSubmit.setProgramType(judgeSubmitDTO.getProgramType());
         userSubmit.setUserCode(judgeSubmitDTO.getUserCode());
+        userSubmit.setCreateBy(judgeSubmitDTO.getUserId());
         // 先把之前的答题数据给删除
         userSubmitMapper.delete(new LambdaQueryWrapper<UserSubmit>()
                 .eq(UserSubmit::getUserId, judgeSubmitDTO.getUserId())

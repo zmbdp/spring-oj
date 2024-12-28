@@ -23,6 +23,7 @@ import com.zmbdp.judge.domain.CompileResult;
 import com.zmbdp.judge.domain.SandBoxExecuteResult;
 import com.zmbdp.judge.service.ISandboxService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RefreshScope
 public class SandboxServiceImpl implements ISandboxService {
 
     @Value("${sandbox.docker.host:tcp://localhost:2375}")
@@ -115,7 +117,7 @@ public class SandboxServiceImpl implements ISandboxService {
                 .build();
         // 拉取 Java 镜像
         pullJavaEnvImage();
-        // 创建容器  限制资源   控制权限
+        // 创建容器  限制资源  控制权限
         HostConfig hostConfig = getHostConfig();
         CreateContainerCmd containerCmd = dockerClient
                 .createContainerCmd(JudgeConstants.JAVA_ENV_IMAGE)

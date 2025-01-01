@@ -32,16 +32,16 @@
     </select>
 
     <select id="selectHostQuestionList" resultType="java.lang.Long">
-        SELECT
+        select
             question_id,
             count(question_id) hot_count
-        FROM
+        from
             tb_user_submit
-        WHERE
+        where
             exam_id is null
-        GROUP BY
+        group by
             question_id
-        ORDER BY
-            hot_count DESC
+        order by
+            hot_count desc 
     </select>
 </mapper>

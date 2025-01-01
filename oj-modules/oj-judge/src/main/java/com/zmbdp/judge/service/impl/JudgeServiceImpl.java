@@ -14,6 +14,7 @@ import com.zmbdp.judge.domain.SandBoxExecuteResult;
 import com.zmbdp.judge.domain.UserSubmit;
 import com.zmbdp.judge.mapper.UserSubmitMapper;
 import com.zmbdp.judge.service.IJudgeService;
+import com.zmbdp.judge.service.ISandboxPoolService;
 import com.zmbdp.judge.service.ISandboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,41 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
     private ISandboxService sandboxService;
 
     @Autowired
+    private ISandboxPoolService sandboxPoolService;
+
+    @Autowired
     private UserSubmitMapper userSubmitMapper;
+
+
+    /**
+     * 用户答题 service 层
+     *
+     * @param judgeSubmitDTO 答题数据
+     * @return 运行结果
+     */
+    @Override
+    public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
+        // 执行判题逻辑
+        SandBoxExecuteResult sandBoxExecuteResult =
+                sandboxPoolService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList());
+        UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
+        if (sandBoxExecuteResult != null && CodeRunStatus.SUCCEED.equals(sandBoxExecuteResult.getRunStatus())) {
+            // 有结果就比对参数，时间限制空间限制这些
+            userQuestionResultVO = doJudge(judgeSubmitDTO, sandBoxExecuteResult, userQuestionResultVO);
+        } else {
+            // 没有结果或者运行错误说明直接错了
+            userQuestionResultVO.setPass(Constants.FALSE);
+            if (sandBoxExecuteResult != null) {
+                userQuestionResultVO.setExeMessage(sandBoxExecuteResult.getExeMessage());
+            } else {
+                userQuestionResultVO.setExeMessage(CodeRunStatus.UNKNOWN_FAILED.getMsg());
+            }
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
+        }
+        // 然后维护数据库中的数据
+        saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
+        return userQuestionResultVO;
+    }
 
     /**
      * 结果比对的方法
@@ -122,36 +157,6 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
             }
         }
         return passed;
-    }
-
-    /**
-     * 用户答题 service 层
-     *
-     * @param judgeSubmitDTO 答题数据
-     * @return 运行结果
-     */
-    @Override
-    public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
-        // 执行判题逻辑
-        SandBoxExecuteResult sandBoxExecuteResult =
-                sandboxService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList());
-        UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
-        if (sandBoxExecuteResult != null && CodeRunStatus.SUCCEED.equals(sandBoxExecuteResult.getRunStatus())) {
-            // 有结果就比对参数，时间限制空间限制这些
-            userQuestionResultVO = doJudge(judgeSubmitDTO, sandBoxExecuteResult, userQuestionResultVO);
-        } else {
-            // 没有结果或者运行错误说明直接错了
-            userQuestionResultVO.setPass(Constants.FALSE);
-            if (sandBoxExecuteResult != null) {
-                userQuestionResultVO.setExeMessage(sandBoxExecuteResult.getExeMessage());
-            } else {
-                userQuestionResultVO.setExeMessage(CodeRunStatus.UNKNOWN_FAILED.getMsg());
-            }
-            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
-        }
-        // 然后维护数据库中的数据
-        saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
-        return userQuestionResultVO;
     }
 
     /**

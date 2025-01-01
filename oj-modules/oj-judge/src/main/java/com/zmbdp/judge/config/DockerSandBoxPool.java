@@ -2,18 +2,10 @@ package com.zmbdp.judge.config;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
-import com.zmbdp.common.core.constants.JudgeConstants;
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.ListImagesCmd;
-import com.github.dockerjava.api.command.PullImageCmd;
-import com.github.dockerjava.api.command.PullImageResultCallback;
-import com.github.dockerjava.api.model.Bind;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.Image;
-import com.github.dockerjava.api.model.Volume;
+import com.github.dockerjava.api.command.*;
+import com.github.dockerjava.api.model.*;
+import com.zmbdp.common.core.constants.JudgeConstants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -65,7 +57,7 @@ public class DockerSandBoxPool {
 
     public void initDockerPool() { // 初始化容器池的
         log.info("--------  创建容器开始  -------");
-        for(int i = 0; i < poolSize; i++) {
+        for (int i = 0; i < poolSize; i++) {
             createContainer(containerNamePrefix + "-" + i);
         }
         log.info("--------  创建容器结束  -------");
@@ -74,7 +66,7 @@ public class DockerSandBoxPool {
     /**
      * 获取容器
      *
-     * @return 容器名字
+     * @return 容器 id
      */
     public String getContainer() {
         try {
@@ -101,7 +93,7 @@ public class DockerSandBoxPool {
                 String[] containerNames = container.getNames();
                 if (containerNames != null && containerNames.length > 0 && names.equals(containerNames[0])) {
                     if ("created".equals(container.getState()) || "exited".equals(container.getState())) {
-                        // 启动容器
+                        // 如果是非启动状态就启动容器
                         dockerClient.startContainerCmd(container.getId()).exec();
                     }
                     // 添加到 容器池 中
@@ -165,13 +157,24 @@ public class DockerSandBoxPool {
         return hostConfig;
     }
 
+    /**
+     * 获取指定容器的挂在路径
+     *
+     * @param containerId 容器 id
+     * @return
+     */
     public String getCodeDir(String containerId) {
         String containerName = containerNameMap.get(containerId);
         log.info("containerName：{}", containerName);
         return System.getProperty("user.dir") + File.separator + JudgeConstants.CODE_DIR_POOL + File.separator + containerName;
     }
 
-    // 为每个容器，创建的指定挂载文件
+    /**
+     * 为每个容器，创建的指定挂载文件
+     *
+     * @param containerName 容器名字
+     * @return 返回路径名
+     */
     private String createContainerDir(String containerName) {
         // 一级目录  存放所有容器的挂载目录
         String codeDir = System.getProperty("user.dir") + File.separator + JudgeConstants.CODE_DIR_POOL;

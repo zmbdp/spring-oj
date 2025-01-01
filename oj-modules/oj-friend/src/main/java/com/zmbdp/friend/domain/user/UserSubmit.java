@@ -38,5 +38,5 @@ public class UserSubmit extends BaseEntity {
 
 	private String exeMessage;
 
-	private String caseJudgeRes;
+	private String caseJudgeRes; // 判题结果
 }

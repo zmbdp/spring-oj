@@ -1,6 +1,7 @@
 package com.zmbdp.judge.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zmbdp.api.domain.UserExeResult;
 import com.zmbdp.api.domain.dto.JudgeSubmitDTO;
@@ -30,35 +31,6 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
     private UserSubmitMapper userSubmitMapper;
 
     /**
-     * 用户答题 service 层
-     *
-     * @param judgeSubmitDTO 答题数据
-     * @return 运行结果
-     */
-    @Override
-    public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
-        SandBoxExecuteResult sandBoxExecuteResult =
-                sandboxService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList());
-        UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
-        if (sandBoxExecuteResult != null && CodeRunStatus.SUCCEED.equals(sandBoxExecuteResult.getRunStatus())) {
-            // 有结果就比对参数，时间限制空间限制这些
-            userQuestionResultVO = doJudge(judgeSubmitDTO, sandBoxExecuteResult, userQuestionResultVO);
-        } else {
-            // 没有结果或者运行错误说明直接错了
-            userQuestionResultVO.setPass(Constants.FALSE);
-            if (sandBoxExecuteResult != null) {
-                userQuestionResultVO.setExeMessage(sandBoxExecuteResult.getExeMessage());
-            } else {
-                userQuestionResultVO.setExeMessage(CodeRunStatus.UNKNOWN_FAILED.getMsg());
-            }
-            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
-        }
-        // 然后维护数据库中的数据
-        saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
-        return userQuestionResultVO;
-    }
-
-    /**
      * 结果比对的方法
      *
      * @param judgeSubmitDTO       题目参数
@@ -86,11 +58,11 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
     /**
      * 比对结果啊，时间限制空间限制这些，然后组装起来
      *
-     * @param judgeSubmitDTO 用户输入数据
+     * @param judgeSubmitDTO       用户输入数据
      * @param sandBoxExecuteResult 正常输出的结果
      * @param userQuestionResultVO 返回给用户的数据
-     * @param userExeResultList 测试用例的输出
-     * @param passed 结果是否正确
+     * @param userExeResultList    测试用例的输出
+     * @param passed               结果是否正确
      * @return 返回给用户的数据
      */
     private static UserQuestionResultVO assembleUserQuestionResultVO(JudgeSubmitDTO judgeSubmitDTO, SandBoxExecuteResult sandBoxExecuteResult, UserQuestionResultVO userQuestionResultVO, List<UserExeResult> userExeResultList, boolean passed) {
@@ -128,9 +100,9 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
     /**
      * 比对 output 的输出结果
      *
-     * @param judgeSubmitDTO 前端写的代码数据
-     * @param outputList 用户代码的输出列表
-     * @param exeOutputList 正常的输出列表
+     * @param judgeSubmitDTO    前端写的代码数据
+     * @param outputList        用户代码的输出列表
+     * @param exeOutputList     正常的输出列表
      * @param userExeResultList 返回给前端的数据
      * @return 结果是否正确
      */
@@ -153,9 +125,39 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
     }
 
     /**
+     * 用户答题 service 层
+     *
+     * @param judgeSubmitDTO 答题数据
+     * @return 运行结果
+     */
+    @Override
+    public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
+        // 执行判题逻辑
+        SandBoxExecuteResult sandBoxExecuteResult =
+                sandboxService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList());
+        UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
+        if (sandBoxExecuteResult != null && CodeRunStatus.SUCCEED.equals(sandBoxExecuteResult.getRunStatus())) {
+            // 有结果就比对参数，时间限制空间限制这些
+            userQuestionResultVO = doJudge(judgeSubmitDTO, sandBoxExecuteResult, userQuestionResultVO);
+        } else {
+            // 没有结果或者运行错误说明直接错了
+            userQuestionResultVO.setPass(Constants.FALSE);
+            if (sandBoxExecuteResult != null) {
+                userQuestionResultVO.setExeMessage(sandBoxExecuteResult.getExeMessage());
+            } else {
+                userQuestionResultVO.setExeMessage(CodeRunStatus.UNKNOWN_FAILED.getMsg());
+            }
+            userQuestionResultVO.setScore(JudgeConstants.ERROR_SCORE);
+        }
+        // 然后维护数据库中的数据
+        saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
+        return userQuestionResultVO;
+    }
+
+    /**
      * 维护数据库中
      *
-     * @param judgeSubmitDTO 用户输入的代码数据
+     * @param judgeSubmitDTO       用户输入的代码数据
      * @param userQuestionResultVO 返回给前端的数据
      */
     private void saveUserSubmit(JudgeSubmitDTO judgeSubmitDTO, UserQuestionResultVO userQuestionResultVO) {
@@ -167,6 +169,7 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
         userSubmit.setProgramType(judgeSubmitDTO.getProgramType());
         userSubmit.setUserCode(judgeSubmitDTO.getUserCode());
         userSubmit.setCreateBy(judgeSubmitDTO.getUserId());
+        userSubmit.setCaseJudgeRes(JSON.toJSONString(userQuestionResultVO.getUserExeResultList()));
         // 先把之前的答题数据给删除
         userSubmitMapper.delete(new LambdaQueryWrapper<UserSubmit>()
                 .eq(UserSubmit::getUserId, judgeSubmitDTO.getUserId())

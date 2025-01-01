@@ -19,6 +19,7 @@
         <module>oj-common-mybatis</module>
         <module>oj-common-elsticsearch</module>
         <module>oj-common-file</module>
+        <module>oj-common-rabbitmq</module>
     </modules>
 
     <properties>

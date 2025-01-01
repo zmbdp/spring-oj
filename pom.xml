@@ -57,6 +57,7 @@
         <oj-common-file.version>1.0-SNAPSHOT</oj-common-file.version>
         <oj-common-elsticsearch.version>1.0-SNAPSHOT</oj-common-elsticsearch.version>
         <oj-api.version>1.0-SNAPSHOT</oj-api.version>
+        <oj-common-rabbitmq.version>1.0-SNAPSHOT</oj-common-rabbitmq.version>
     </properties>
 
     <dependencies>

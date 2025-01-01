@@ -6,4 +6,9 @@ import com.zmbdp.friend.domain.user.dto.UserSubmitDTO;
 
 public interface IUserQuestionService {
     Result<UserQuestionResultVO> submit(UserSubmitDTO submitDTO);
+
+    Result<Void> rabbitSubmit(UserSubmitDTO submitDTO);
+
+    UserQuestionResultVO exeResult(Long examId, Long questionId, String currentTime);
+
 }

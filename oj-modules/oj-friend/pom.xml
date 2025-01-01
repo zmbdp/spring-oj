@@ -48,6 +48,12 @@
             <version>${oj-api.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>oj-common-rabbitmq</artifactId>
+            <version>${oj-common-rabbitmq.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

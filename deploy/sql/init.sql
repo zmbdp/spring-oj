@@ -167,6 +167,7 @@ create table tb_user_submit
     user_code    text     not null comment '用户代码',
     pass         tinyint  not null comment '0：未通过  1：通过',
     exe_message  varchar(1024) comment '执行结果',
+    case_judge_res varchar(2048) comment '测试用例输出结果',
     score        int      not null default '0' comment '得分',
     create_by    bigint unsigned not null  comment '创建人',
     create_time  datetime not null comment '创建时间',

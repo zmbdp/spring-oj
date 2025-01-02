@@ -23,6 +23,7 @@ public class UserCacheManager {
             return;
         }
         user.setStatus(status);
+        // 再刷新到 redis 中
         redisService.setCacheObject(userKey, user);
         // 设置用户缓存有效期为 10 分钟
         redisService.expire(userKey, CacheConstants.USER_EXP, TimeUnit.MINUTES);

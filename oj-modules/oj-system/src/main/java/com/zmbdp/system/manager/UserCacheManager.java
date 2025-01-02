@@ -18,6 +18,7 @@ public class UserCacheManager {
         // 刷新用户缓存
         String userKey = getUserKey(userId);
         User user = redisService.getCacheObject(userKey, User.class);
+        // 如果缓存没有就直接返回就行，会自动去数据库中查
         if (user == null) {
             return;
         }

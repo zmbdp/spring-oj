@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class QuestionDetailVO extends QuestionVo {
+public class QuestionDetailVO extends QuestionVO {
 
     private Long timeLimit; // 时间限制
 

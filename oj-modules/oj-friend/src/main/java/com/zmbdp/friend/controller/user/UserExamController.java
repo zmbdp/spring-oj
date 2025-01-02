@@ -3,6 +3,7 @@ package com.zmbdp.friend.controller.user;
 import com.zmbdp.common.core.constants.HttpConstants;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
+import com.zmbdp.friend.aspect.CheckUserStatus;
 import com.zmbdp.friend.domain.exam.dto.ExamDTO;
 import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.friend.service.user.IUserExamService;
@@ -24,6 +25,7 @@ public class UserExamController {
      * @param examDTO 竞赛的相关信息
      * @return 是否成功
      */
+    @CheckUserStatus // 使用 aop 分别是不是拉黑用户
     @PostMapping("/enter")
     public Result<Void> enter(@RequestHeader(HttpConstants.AUTHENTICATION) String token, @RequestBody ExamDTO examDTO) {
         return userExamService.enter(token, examDTO.getExamId());

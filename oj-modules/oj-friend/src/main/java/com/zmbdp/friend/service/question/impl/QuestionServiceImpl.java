@@ -4,10 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.util.StringUtil;
-import com.zmbdp.common.core.domain.Result;
+import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.domain.TableDataInfo;
-import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.friend.domain.question.Question;
 import com.zmbdp.friend.domain.question.dto.QuestionQueryDTO;
@@ -16,8 +16,9 @@ import com.zmbdp.friend.domain.question.vo.QuestionDetailVO;
 import com.zmbdp.friend.elasticsearch.QuestionRepository;
 import com.zmbdp.friend.manager.QuestionCacheManager;
 import com.zmbdp.friend.mapper.question.QuestionMapper;
+import com.zmbdp.friend.mapper.user.UserSubmitMapper;
 import com.zmbdp.friend.service.question.IQuestionService;
-import com.zmbdp.friend.domain.question.vo.QuestionVo;
+import com.zmbdp.friend.domain.question.vo.QuestionVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +37,9 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
 
     @Autowired
     private QuestionMapper questionMapper;
+
+    @Autowired
+    private UserSubmitMapper userSubmitMapper;
 
     @Autowired
     private QuestionCacheManager questionCacheManager;
@@ -78,8 +83,8 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
             return TableDataInfo.empty();
         }
         List<QuestionES> questionESList = questionESPage.getContent();
-        List<QuestionVo> questionVoList = BeanUtil.copyToList(questionESList, QuestionVo.class);
-        return TableDataInfo.success(questionVoList, total);
+        List<QuestionVO> questionVOList = BeanUtil.copyToList(questionESList, QuestionVO.class);
+        return TableDataInfo.success(questionVOList, total);
     }
 
     /**
@@ -147,6 +152,31 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
     }
 
     /**
+     * 获取热榜排行 service 层
+     *
+     * @return 排行的数据
+     */
+    @Override
+    public List<QuestionVO> hotList() {
+        // 从缓存中拿到这些列表id
+        Long total = questionCacheManager.getHostListSize();
+        List<Long> hotQuestionIdList;
+        if (total == null || total <= 0) {
+            // 如果没拿到就缓存同步，就从数据库中拿到，要设置分页这些参数
+            PageHelper.startPage(Constants.HOST_QUESTION_LIST_START, Constants.HOST_QUESTION_LIST_END);
+            // 把数据库中的数据给拿出来
+            hotQuestionIdList = userSubmitMapper.selectHostQuestionList();
+            // 然后刷新缓存
+            questionCacheManager.refreshHotQuestionList(hotQuestionIdList);
+        } else {
+            // 如果缓存中有就直接拿到这些数据
+            hotQuestionIdList = questionCacheManager.getHostList();
+        }
+        // 然后进行组装
+        return assembleQuestionVOList(hotQuestionIdList);
+    }
+
+    /**
      * es 缓存同步方法
      */
     private void refreshQuestion() {
@@ -157,5 +187,25 @@ public class QuestionServiceImpl extends BaseService implements IQuestionService
         // 说明有数据，就得同步给 es
         List<QuestionES> questionES = BeanUtil.copyToList(questions, QuestionES.class);
         questionRepository.saveAll(questionES);
+    }
+
+    /**
+     * 整理数据
+     *
+     * @param hotQuestionIdList 排好的列表
+     * @return 整理成 VO 数据返回
+     */
+    private List<QuestionVO> assembleQuestionVOList(List<Long> hotQuestionIdList) {
+        if (CollectionUtil.isEmpty(hotQuestionIdList)) {
+            return new ArrayList<>();
+        }
+        List<QuestionVO> resultList = new ArrayList<>();
+        for (Long questionId : hotQuestionIdList) {
+            QuestionVO questionVO = new QuestionVO();
+            QuestionDetailVO detail = detail(questionId);
+            questionVO.setTitle(detail.getTitle());
+            resultList.add(questionVO);
+        }
+        return resultList;
     }
 }

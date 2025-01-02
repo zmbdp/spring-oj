@@ -1,5 +1,5 @@
 package com.zmbdp.friend.controller.question;
-
+import com.zmbdp.friend.domain.question.vo.QuestionVO;
 import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.friend.domain.question.dto.QuestionQueryDTO;
@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/question")
@@ -26,6 +28,16 @@ public class QuestionController {
     @GetMapping("/semiLogin/list")
     public TableDataInfo list(QuestionQueryDTO questionQueryDTO) {
         return questionService.list(questionQueryDTO);
+    }
+
+    /**
+     * 获取热榜排行接口
+     *
+     * @return 排行的数据
+     */
+    @GetMapping("/semiLogin/hotList")
+    public Result<List<QuestionVO>> hotList() {
+        return Result.success(questionService.hotList());
     }
 
     /**

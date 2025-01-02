@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 @Data
-public class QuestionVo {
+public class QuestionVO {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long questionId; // 题目 id
 

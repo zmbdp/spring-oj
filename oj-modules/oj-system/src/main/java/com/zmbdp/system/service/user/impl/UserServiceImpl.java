@@ -43,7 +43,7 @@ public class UserServiceImpl extends BaseService implements IUserService {
             return Result.fail(ResultCode.FAILED_USER_NOT_EXISTS);
         }
         user.setStatus(userDTO.getStatus());
-        // 再删除 redis 中关于这个人的数据的缓存
+        // 再刷新 redis 中关于这个人的数据的缓存
         userCacheManager.updateStatus(user.getUserId(), userDTO.getStatus());
         return toResult(userMapper.updateById(user));
     }

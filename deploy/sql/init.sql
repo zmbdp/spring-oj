@@ -127,12 +127,12 @@ create table tb_user_exam
     primary key (user_exam_id)
 ) engine = innodb default character set = utf8mb4 comment = '用户竞赛关系表';
 
-
+-- 关于用户消息的表
 drop table if exists tb_message;
 create table tb_message
 (
     message_id  bigint unsigned not null comment '消息id（主键）',
-    text_id     bigint unsigned not null comment '消息内容id（主键）',
+    text_id     bigint unsigned not null comment '消息内容id（外键）',
     send_id     bigint unsigned not null comment '消息发送人id',
     rec_id      bigint unsigned not null comment '消息接收人id',
     create_by   bigint unsigned not null  comment '创建人',

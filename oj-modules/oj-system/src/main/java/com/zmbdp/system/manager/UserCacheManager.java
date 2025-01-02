@@ -27,7 +27,7 @@ public class UserCacheManager {
         redisService.expire(userKey, CacheConstants.USER_EXP, TimeUnit.MINUTES);
     }
 
-    // u:d:用户id
+    // u:d: 用户 id
     private String getUserKey(Long userId) {
         return CacheConstants.USER_DETAIL + userId;
     }

@@ -2,6 +2,7 @@ package com.zmbdp.friend.controller.user;
 
 import com.zmbdp.api.domain.vo.UserQuestionResultVO;
 import com.zmbdp.common.core.domain.Result;
+import com.zmbdp.friend.aspect.CheckUserStatus;
 import com.zmbdp.friend.domain.user.dto.UserSubmitDTO;
 import com.zmbdp.friend.service.user.IUserQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class UserQuestionController {
      * @param submitDTO
      * @return
      */
+    @CheckUserStatus
     @PostMapping("/rabbit/submit")
     public Result<Void> rabbitSubmit(@RequestBody UserSubmitDTO submitDTO) {
         return userQuestionService.rabbitSubmit(submitDTO);

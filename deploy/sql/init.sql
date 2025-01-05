@@ -146,8 +146,8 @@ drop table if exists tb_message_text;
 create table tb_message_text
 (
     text_id         bigint unsigned not null comment '消息内容id（主键）',
-    message_title   varchar(10)  not null comment '消息标题',
-    message_content varchar(200) not null comment '消息内容',
+    message_title   varchar(16)  not null comment '消息标题',
+    message_content varchar(512) not null comment '消息内容',
     create_by       bigint unsigned not null  comment '创建人',
     create_time     datetime     not null comment '创建时间',
     update_by       bigint unsigned  comment '更新人',
@@ -163,7 +163,7 @@ create table tb_user_submit
     user_id      bigint unsigned not null comment '用户id',
     question_id  bigint unsigned not null comment '题目id',
     exam_id      bigint unsigned  comment '竞赛id',
-    program_type tinyint  not null comment '代码类型 0 java   1 cpp',
+    program_type tinyint  not null comment '代码类型 0-java   1-cpp',
     user_code    text     not null comment '用户代码',
     pass         tinyint  not null comment '0：未通过  1：通过',
     exe_message  varchar(1024) comment '执行结果',

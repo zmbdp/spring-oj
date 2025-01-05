@@ -1,4 +1,4 @@
-package com.zmbdp.jop.domain;
+package com.zmbdp.jop.domain.exam;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

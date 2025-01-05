@@ -1,14 +1,13 @@
-package com.zmbdp.jop.handler;
+package com.zmbdp.jop.handler.exam;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.Constants;
-import com.zmbdp.common.core.enums.ExamListType;
 import com.zmbdp.common.redis.service.RedisService;
-import com.zmbdp.jop.domain.Exam;
-import com.zmbdp.jop.mapper.ExamMapper;
+import com.zmbdp.jop.domain.exam.Exam;
+import com.zmbdp.jop.mapper.exam.ExamMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,7 +29,7 @@ public class ExamXxlJob {
     private RedisService redisService;
 
     @XxlJob("examListOrganizeHandler")
-    public void examListOrganizeHandler(){
+    public void examListOrganizeHandler() {
         // 哪些竞赛应该放入历史竞赛中，哪些应该在未完赛的竞赛中，统计好之后放入缓存中
         // 直接执行两个的，第一个未过期
         List<Exam> unFinishList = examMapper.selectList(new LambdaQueryWrapper<Exam>()

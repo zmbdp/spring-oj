@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zmbdp.friend.mapper.message.MessageTextMapper">
+
+    <select id="selectUserMsgList" resultType="com.zmbdp.friend.domain.message.vo.MessageTextVO">
+        select
+            t.text_id,
+            t.message_title,
+            t.message_content
+        from
+            tb_message m
+                join
+            tb_message_text  t
+            on
+                m.text_id = t.text_id
+        where
+            m.rec_id = #{userId}
+        order by
+            m.create_time desc
+    </select>
+</mapper>

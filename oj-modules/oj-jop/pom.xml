@@ -31,6 +31,13 @@
             <artifactId>xxl-job-core</artifactId>
             <version>${xxl-job.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.zmbdp</groupId>
+            <artifactId>oj-common-mybatis</artifactId>
+            <version>${oj-common-mybatis.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

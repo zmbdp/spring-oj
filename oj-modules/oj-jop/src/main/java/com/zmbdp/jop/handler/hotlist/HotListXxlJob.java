@@ -24,8 +24,8 @@ public class HotListXxlJob {
     @Autowired
     private RedisService redisService;
 
-    @XxlJob("hotListOrganizeHandler")
-    public void hotListOrganizeHandler() {
+    @XxlJob("hotQuestionListHandler")
+    public void hotQuestionListHandler() {
         log.info("----- 题目热门列表统计开始 ------");
         // 从数据库中拿到，要设置分页这些参数
         PageHelper.startPage(Constants.HOST_QUESTION_LIST_START, Constants.HOST_QUESTION_LIST_END);

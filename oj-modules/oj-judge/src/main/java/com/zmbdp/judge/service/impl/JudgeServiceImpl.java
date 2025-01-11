@@ -36,7 +36,7 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
 
 
     /**
-     * 用户答题 service 层
+     * 用户判题 service 层
      *
      * @param judgeSubmitDTO 答题数据
      * @return 运行结果

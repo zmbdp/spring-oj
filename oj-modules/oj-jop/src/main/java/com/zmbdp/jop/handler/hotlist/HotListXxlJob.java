@@ -6,7 +6,6 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.redis.service.RedisService;
-import com.zmbdp.common.security.exception.ServiceException;
 import com.zmbdp.jop.mapper.user.UserSubmitMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

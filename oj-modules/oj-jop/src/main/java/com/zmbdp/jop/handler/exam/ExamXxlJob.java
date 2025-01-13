@@ -88,15 +88,14 @@ public class ExamXxlJob {
                 .eq(Exam::getStatus, Constants.TRUE)
                 .ge(Exam::getEndTime, minusDateTime) // 结束时间大于等于昨天时间
                 .le(Exam::getEndTime, now)); // 小于现在时间的
-        if (CollectionUtil.isEmpty(examList)) {
-            return;
+        if (CollectionUtil.isNotEmpty(examList)) {
+            Set<Long> examIdSet = examList.stream().map(Exam::getExamId).collect(Collectors.toSet());
+            // 根据分数排名，获得用户信息
+            List<UserScore> userScoreList = userSubmitMapper.selectUserScoreList(examIdSet);
+            Map<Long, List<UserScore>> userScoreMap = userScoreList.stream().collect(Collectors.groupingBy(UserScore::getExamId));
+            // 然后再创建消息放到 redis 中
+            createMessage(examList, userScoreMap);
         }
-        Set<Long> examIdSet = examList.stream().map(Exam::getExamId).collect(Collectors.toSet());
-        // 根据分数排名，获得用户信息
-        List<UserScore> userScoreList = userSubmitMapper.selectUserScoreList(examIdSet);
-        Map<Long, List<UserScore>> userScoreMap = userScoreList.stream().collect(Collectors.groupingBy(UserScore::getExamId));
-        // 然后再创建消息放到 redis 中
-        createMessage(examList, userScoreMap);
         log.info("*** 刷新用户消息结束 ***");
     }
 
@@ -132,6 +131,8 @@ public class ExamXxlJob {
                 examRank++;
             }
             userExamMapper.updateUserScoreAndRank(userScoreList);
+            // 先删除，再插入
+            redisService.deleteObject(getExamRankListKey(examId));
             redisService.rightPushAll(getExamRankListKey(examId), userScoreList);
         }
         messageTextService.batchInsert(messageTextList);

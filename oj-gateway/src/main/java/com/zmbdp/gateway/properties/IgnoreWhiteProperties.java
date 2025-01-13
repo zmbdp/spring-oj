@@ -1,7 +1,6 @@
 package com.zmbdp.gateway.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
-@Getter
+@Data
 @RefreshScope
 @Configuration
 @ConfigurationProperties(prefix = "security.ignore")

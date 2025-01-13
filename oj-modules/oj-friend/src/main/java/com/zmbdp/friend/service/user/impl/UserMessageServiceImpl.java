@@ -1,14 +1,18 @@
 package com.zmbdp.friend.service.user.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.domain.PageQueryDTO;
+import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.common.core.utils.ThreadLocalUtil;
+import com.zmbdp.friend.domain.message.Message;
 import com.zmbdp.friend.domain.message.vo.MessageTextVO;
 import com.zmbdp.friend.manager.MessageCacheManager;
+import com.zmbdp.friend.mapper.message.MessageMapper;
 import com.zmbdp.friend.mapper.message.MessageTextMapper;
 import com.zmbdp.friend.service.user.IUserMessageService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +30,9 @@ public class UserMessageServiceImpl implements IUserMessageService {
 
     @Autowired
     private MessageTextMapper messageTextMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Override
     public TableDataInfo list(PageQueryDTO dto) {
@@ -50,5 +57,22 @@ public class UserMessageServiceImpl implements IUserMessageService {
             return TableDataInfo.empty();
         }
         return TableDataInfo.success(messageTextVOList, total);
+    }
+
+    /**
+     * 删除消息 service 层
+     *
+     * @param textId 消息 id
+     * @return 成功与否
+     */
+    @Override
+    public Result<Void> delete(Long textId) {
+        Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+        // 先删除数据库的
+        messageMapper.delete(new LambdaQueryWrapper<Message>().eq(Message::getTextId, textId));
+        messageTextMapper.deleteById(textId);
+        // 然后再删除缓存中的
+        messageCacheManager.deleteCache(userId, textId);
+        return Result.success();
     }
 }

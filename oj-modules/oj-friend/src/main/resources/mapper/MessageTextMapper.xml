@@ -11,9 +11,9 @@
             t.message_content
         from
             tb_message m
-                join
+        join
             tb_message_text  t
-            on
+        on
                 m.text_id = t.text_id
         where
             m.rec_id = #{userId}

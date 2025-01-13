@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zmbdp.common.core.domain.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@Data
 @TableName("tb_message_text")
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
 public class MessageText extends BaseEntity {
 
     @TableId(value = "TEXT_ID", type = IdType.ASSIGN_ID)

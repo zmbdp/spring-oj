@@ -16,12 +16,14 @@ import com.zmbdp.judge.mapper.UserSubmitMapper;
 import com.zmbdp.judge.service.IJudgeService;
 import com.zmbdp.judge.service.ISandboxPoolService;
 import com.zmbdp.judge.service.ISandboxService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class JudgeServiceImpl extends BaseService implements IJudgeService {
 
@@ -44,6 +46,7 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
     @Override
     public UserQuestionResultVO doJudgeJavaCode(JudgeSubmitDTO judgeSubmitDTO) {
         // 执行判题逻辑
+        log.info("---- 判题逻辑开始 -------");
         SandBoxExecuteResult sandBoxExecuteResult =
                 sandboxPoolService.exeJavaCode(judgeSubmitDTO.getUserId(), judgeSubmitDTO.getUserCode(), judgeSubmitDTO.getInputList());
         UserQuestionResultVO userQuestionResultVO = new UserQuestionResultVO();
@@ -62,6 +65,7 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
         }
         // 然后维护数据库中的数据
         saveUserSubmit(judgeSubmitDTO, userQuestionResultVO);
+        log.info("判题逻辑结束，判题结果为： {} ", userQuestionResultVO);
         return userQuestionResultVO;
     }
 
@@ -160,7 +164,7 @@ public class JudgeServiceImpl extends BaseService implements IJudgeService {
     }
 
     /**
-     * 维护数据库中
+     * 维护数据库中的用户答题数据
      *
      * @param judgeSubmitDTO       用户输入的代码数据
      * @param userQuestionResultVO 返回给前端的数据

@@ -10,8 +10,6 @@ import com.zmbdp.friend.service.user.IUserExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/user/exam")
 public class UserExamController {
@@ -21,7 +19,8 @@ public class UserExamController {
 
     /**
      * 用户报名参加竞赛接口
-     * @param token 用户信息
+     *
+     * @param token   用户信息
      * @param examDTO 竞赛的相关信息
      * @return 是否成功
      */
@@ -33,6 +32,7 @@ public class UserExamController {
 
     /**
      * 我的竞赛列表数据查询
+     *
      * @param examQueryDTO 用户信息
      * @return 用户报名的所有竞赛
      */

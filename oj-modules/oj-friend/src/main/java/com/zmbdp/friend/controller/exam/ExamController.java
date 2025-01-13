@@ -4,6 +4,7 @@ import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
+import com.zmbdp.friend.domain.exam.dto.ExamRankDTO;
 import com.zmbdp.friend.service.exam.IExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +28,12 @@ public class ExamController extends BaseService {
     @GetMapping("/semiLogin/redis/list")
     public TableDataInfo redisList(@Validated ExamQueryDTO examQueryDTO) {
         return examService.redisList(examQueryDTO);
+    }
+
+    // 获取竞赛排名的接口
+    @GetMapping("/rank/list")
+    public TableDataInfo rankList(ExamRankDTO examRankDTO) {
+        return examService.rankList(examRankDTO);
     }
 
     // 获取首个题目的 id 接口

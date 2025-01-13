@@ -47,7 +47,7 @@ create table tb_question
     difficulty    tinyint       not null comment '题目难度 1: 简单; 2: 普通 ; 3: 困难',
     time_limit    int comment '时间限制(ms)',
     space_limit   int comment '空间限制(Byte)',
-    content       varchar(1024) not null comment '题目内容',
+    content       varchar(10240) not null comment '题目内容',
     question_case varchar(1024) not null comment '题目用例',
     default_code  varchar(512)  not null comment '默认代码块',
     main_fuc      varchar(512)  not null comment 'main函数',

@@ -182,7 +182,10 @@ public class ExamCacheManager {
         redisService.rightPushAll(getExamListKey(examListType, userId), examIdList);
     }
 
-    // 刷新竞赛题目列表缓存
+    /** 刷新竞赛题目列表缓存
+     *
+     * @param examId 竞赛 id
+     */
     public void refreshExamQuestionCache(Long examId) {
         List<ExamQuestion> examQuestionList = examQuestionMapper.selectList(new LambdaQueryWrapper<ExamQuestion>()
                 .select(ExamQuestion::getQuestionId)
@@ -197,6 +200,18 @@ public class ExamCacheManager {
         long seconds = ChronoUnit.SECONDS.between(LocalDateTime.now(),
                 LocalDateTime.now().plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0));
         redisService.expire(getExamQuestionListKey(examId), seconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 刷新竞赛排名缓存
+     * @param examId 竞赛 id
+     */
+    public void refreshExamRankCache(Long examId) {
+        List<ExamRankVO> examRankVOList = userExamMapper.selectExamRankList(examId);
+        if (CollectionUtil.isEmpty(examRankVOList)) {
+            return;
+        }
+        redisService.rightPushAll(getExamRankListKey(examId), examRankVOList);
     }
 
     private List<ExamVO> getExamListByDB(ExamQueryDTO examQueryDTO, Long userId) {

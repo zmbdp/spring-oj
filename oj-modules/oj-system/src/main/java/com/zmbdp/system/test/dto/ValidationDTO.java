@@ -1,12 +1,11 @@
 package com.zmbdp.system.test.dto;
 
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 public class ValidationDTO {
 
     @NotNull(message = "昵称不能为空")
@@ -27,8 +26,8 @@ public class ValidationDTO {
     private String email;
 
     @Pattern(
-        regexp = "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$",
-        message = "手机号码格式不正确"
+            regexp = "^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$",
+            message = "手机号码格式不正确"
     )
     private String phone;
 

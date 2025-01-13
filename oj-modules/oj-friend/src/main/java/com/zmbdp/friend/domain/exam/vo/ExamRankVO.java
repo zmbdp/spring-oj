@@ -5,12 +5,12 @@ import lombok.Data;
 @Data
 public class ExamRankVO {
 
-    private Long userId;
+    private Long userId; // 用户 id
 
-    private String nickName;
+    private String nickName; //昵称
 
-    private int examRank;
+    private int examRank; // 排名
 
-    private int score;
+    private int score; // 得分
 
 }

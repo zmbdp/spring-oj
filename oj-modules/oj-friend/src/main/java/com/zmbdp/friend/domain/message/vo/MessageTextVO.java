@@ -1,12 +1,12 @@
 package com.zmbdp.friend.domain.message.vo;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class MessageTextVO {
-
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long textId;
 
     private String messageTitle;

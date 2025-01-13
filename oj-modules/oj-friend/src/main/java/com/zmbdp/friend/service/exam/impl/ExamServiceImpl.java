@@ -4,15 +4,18 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zmbdp.common.core.constants.Constants;
-import com.zmbdp.common.core.domain.Result;
 import com.zmbdp.common.core.domain.TableDataInfo;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.utils.ThreadLocalUtil;
-import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
+import com.zmbdp.friend.domain.exam.dto.ExamRankDTO;
+import com.zmbdp.friend.domain.exam.vo.ExamRankVO;
 import com.zmbdp.friend.domain.exam.vo.ExamVO;
+import com.zmbdp.friend.domain.user.vo.UserVO;
 import com.zmbdp.friend.manager.ExamCacheManager;
+import com.zmbdp.friend.manager.UserCacheManager;
 import com.zmbdp.friend.mapper.exam.ExamMapper;
+import com.zmbdp.friend.mapper.user.UserExamMapper;
 import com.zmbdp.friend.service.exam.IExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,12 @@ public class ExamServiceImpl extends BaseService implements IExamService {
 
     @Autowired
     private ExamCacheManager examCacheManager;
+
+    @Autowired
+    private UserExamMapper userExamMapper;
+
+    @Autowired
+    private UserCacheManager userCacheManager;
 
     /**
      * 获取题目列表 service 层
@@ -88,7 +97,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
     /**
      * 获取上一题 id 的 service 层
      *
-     * @param examId 竞赛 id
+     * @param examId     竞赛 id
      * @param questionId 题目 id
      * @return 上一题的题目 id
      */
@@ -103,7 +112,7 @@ public class ExamServiceImpl extends BaseService implements IExamService {
     /**
      * 获取下一题 id 的 service 层
      *
-     * @param examId 竞赛 id
+     * @param examId     竞赛 id
      * @param questionId 题目 id
      * @return 下一题的题目 id
      */
@@ -115,12 +124,49 @@ public class ExamServiceImpl extends BaseService implements IExamService {
         return examCacheManager.nextQuestion(examId, questionId).toString();
     }
 
+    /**
+     * 获取竞赛排名的 service 层
+     *
+     * @param examRankDTO 竞赛排名需要的相关参数
+     * @return 排名列表
+     */
+    @Override
+    public TableDataInfo rankList(ExamRankDTO examRankDTO) {
+        // 先查缓存，没有就查数据库
+        Long total = examCacheManager.getRankListSize(examRankDTO.getExamId());
+        List<ExamRankVO> examRankVOList;
+        if (total == null || total <= 0) {
+            // 没有就查数据库
+            PageHelper.startPage(examRankDTO.getPageNum(), examRankDTO.getPageSize());
+            examRankVOList = userExamMapper.selectExamRankList(examRankDTO.getExamId());
+            examCacheManager.refreshExamRankCache(examRankDTO.getExamId());
+            total = new PageInfo<>(examRankVOList).getTotal();
+        } else {
+            examRankVOList = examCacheManager.getExamRankList(examRankDTO);
+        }
+        if (CollectionUtil.isEmpty(examRankVOList)) {
+            return TableDataInfo.empty();
+        }
+        assembleExamRankVOList(examRankVOList);
+        return TableDataInfo.success(examRankVOList, total);
+    }
+
     private void checkAndRefresh(Long examId) {
         // 先判断缓存是否有数据
         Long listSize = examCacheManager.getExamQuestionListSize(examId);
         if (listSize == null || listSize <= 0) {
             // 如果没有就刷新缓存
             examCacheManager.refreshExamQuestionCache(examId);
+        }
+    }
+    private void assembleExamRankVOList(List<ExamRankVO> examRankVOList) {
+        if (CollectionUtil.isEmpty(examRankVOList)) {
+            return;
+        }
+        for (ExamRankVO examRankVO : examRankVOList) {
+            Long userId = examRankVO.getUserId();
+            UserVO user = userCacheManager.getUserById(userId);
+            examRankVO.setNickName(user.getNickName());
         }
     }
 

@@ -51,7 +51,8 @@
         <oj-common-swagger.version>1.0-SNAPSHOT</oj-common-swagger.version>
         <oj-common-redis.version>1.0-SNAPSHOT</oj-common-redis.version>
         <oj-common-security.version>1.0-SNAPSHOT</oj-common-security.version>
-        <oj-common-mybatis.version>1.0-SNAPSHOT</oj-common-mybatis.version>
+        <oj-common-mybatis.version>
+            1.0-SNAPSHOT</oj-common-mybatis.version>
         <oj-system.version>1.0-SNAPSHOT</oj-system.version>
         <oj-common-message.version>1.0-SNAPSHOT</oj-common-message.version>
         <oj-common-file.version>1.0-SNAPSHOT</oj-common-file.version>

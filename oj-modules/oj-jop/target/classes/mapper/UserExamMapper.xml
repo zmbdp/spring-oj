@@ -6,12 +6,7 @@
 
     <update id="updateUserScoreAndRank">
         <foreach collection="userScoreList" item="item" separator=";">
-            update
-                tb_user_exam
-            set
-                score = #{item.score}, exam_rank = #{item.examRank}
-            where
-                exam_id = #{item.examId} and user_id = #{item.userId}
+            update tb_user_exam set score = #{item.score}, exam_rank = #{item.examRank} where exam_id = #{item.examId} and user_id = #{item.userId}
         </foreach>
     </update>
 </mapper>

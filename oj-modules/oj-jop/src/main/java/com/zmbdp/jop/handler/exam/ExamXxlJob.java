@@ -6,14 +6,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.Constants;
+import com.zmbdp.common.core.domain.Result;
+import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.redis.service.RedisService;
+import com.zmbdp.common.security.exception.ServiceException;
 import com.zmbdp.jop.domain.exam.Exam;
 import com.zmbdp.jop.domain.message.Message;
 import com.zmbdp.jop.domain.message.MessageText;
 import com.zmbdp.jop.domain.message.vo.MessageTextVO;
 import com.zmbdp.jop.domain.user.UserScore;
 import com.zmbdp.jop.mapper.exam.ExamMapper;
-import com.zmbdp.jop.mapper.message.MessageTextMapper;
 import com.zmbdp.jop.mapper.user.UserExamMapper;
 import com.zmbdp.jop.mapper.user.UserSubmitMapper;
 import com.zmbdp.jop.service.IMessageService;
@@ -102,7 +104,7 @@ public class ExamXxlJob {
     /**
      * 创建消息
      *
-     * @param examList 消息列表
+     * @param examList     消息列表
      * @param userScoreMap 用户表
      */
     private void createMessage(List<Exam> examList, Map<Long, List<UserScore>> userScoreMap) {
@@ -114,9 +116,9 @@ public class ExamXxlJob {
             int totalUser = userScoreList.size();
             int examRank = 1;
             for (UserScore userScore : userScoreList) {
-                String msgTitle =  exam.getTitle() + "——排名情况";
+                String msgTitle = exam.getTitle() + "——排名情况";
                 String msgContent = "您所参与的竞赛：" + exam.getTitle()
-                        + "，本次参与竞赛一共" + totalUser + "人， 您排名第"  + examRank + "名！";
+                        + "，本次参与竞赛一共" + totalUser + "人， 您排名第" + examRank + "名！";
                 userScore.setExamRank(examRank);
                 MessageText messageText = new MessageText();
                 messageText.setMessageTitle(msgTitle);
@@ -130,9 +132,12 @@ public class ExamXxlJob {
                 messageList.add(message);
                 examRank++;
             }
-            userExamMapper.updateUserScoreAndRank(userScoreList);
+            try {
+                userExamMapper.updateUserScoreAndRank(userScoreList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             // 先删除，再插入
-            redisService.deleteObject(getExamRankListKey(examId));
             redisService.rightPushAll(getExamRankListKey(examId), userScoreList);
         }
         messageTextService.batchInsert(messageTextList);

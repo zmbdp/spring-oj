@@ -16,12 +16,14 @@ import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.utils.ThreadLocalUtil;
 import com.zmbdp.common.security.exception.ServiceException;
+import com.zmbdp.friend.domain.exam.Exam;
 import com.zmbdp.friend.domain.question.Question;
 import com.zmbdp.friend.domain.question.QuestionCase;
 import com.zmbdp.friend.domain.question.es.QuestionES;
 import com.zmbdp.friend.domain.user.UserSubmit;
 import com.zmbdp.friend.domain.user.dto.UserSubmitDTO;
 import com.zmbdp.friend.elasticsearch.QuestionRepository;
+import com.zmbdp.friend.mapper.exam.ExamMapper;
 import com.zmbdp.friend.mapper.question.QuestionMapper;
 import com.zmbdp.friend.mapper.user.UserSubmitMapper;
 import com.zmbdp.friend.rabbit.JudgeProducer;
@@ -29,6 +31,7 @@ import com.zmbdp.friend.service.user.IUserQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -48,6 +51,9 @@ public class UserQuestionServiceImpl extends BaseService implements IUserQuestio
 
     @Autowired
     private JudgeProducer judgeProducer;
+
+    @Autowired
+    private ExamMapper examMapper;
 
     /**
      * 执行代码逻辑 service 层
@@ -76,6 +82,18 @@ public class UserQuestionServiceImpl extends BaseService implements IUserQuestio
     @Override
     public Result<Void> rabbitSubmit(UserSubmitDTO submitDTO) {
         Integer programType = submitDTO.getProgramType();
+        // 如果 examId 不为空，就看看这个竞赛是否结束，如果是结束了就不能加分了
+        if (submitDTO.getExamId() != null) {
+            // 查询竞赛信息
+            Exam exam = examMapper.selectById(submitDTO.getExamId());
+            if (exam != null && exam.getEndTime() != null) {
+                // 检查竞赛的结束时间是否早于当前时间，并且是没有分数的，就直接制空
+                if (exam.getEndTime().isBefore(LocalDateTime.now())) {
+                    // 如果竞赛已结束，将 submitDTO 的 examId 设置为 null
+                    submitDTO.setExamId(null);
+                }
+            }
+        }
         if (ProgramType.JAVA.getValue().equals(programType)) {
             // 按照 java 逻辑处理
             JudgeSubmitDTO judgeSubmitDTO = assembleJudgeSubmitDTO(submitDTO);

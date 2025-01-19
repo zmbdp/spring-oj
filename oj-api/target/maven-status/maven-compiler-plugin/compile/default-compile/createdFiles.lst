@@ -1,0 +1,4 @@
+com\zmbdp\api\RemoteJudgeService.class
+com\zmbdp\api\domain\dto\JudgeSubmitDTO.class
+com\zmbdp\api\domain\UserExeResult.class
+com\zmbdp\api\domain\vo\UserQuestionResultVO.class

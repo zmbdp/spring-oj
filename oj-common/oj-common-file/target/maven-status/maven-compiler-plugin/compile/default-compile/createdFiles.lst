@@ -1,0 +1,4 @@
+com\zmbdp\common\file\config\OSSProperties.class
+com\zmbdp\common\file\service\OSSService.class
+com\zmbdp\common\file\config\OSSConfig.class
+com\zmbdp\common\file\domain\OSSResult.class

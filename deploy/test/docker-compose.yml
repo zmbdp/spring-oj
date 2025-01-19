@@ -1,0 +1,28 @@
+# 指定 Docker Compose 文件的版本
+version: '3.8'
+
+# services：定义了服务列表
+services:
+  oj-mysql-server:
+    image: mysql:5.7
+    container_name: oj-mysql-server
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      # root 密码
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes:
+      # 数据挂载
+      - ./mysql/mysqldata/:/var/lib/mysql/
+    # 配置MySQL 服务器的字符集与排序规则
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+    # 通过执行特定的 MySQL 命令来检查服务的健康状态，用于测试连接到 MySQL 服务器
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

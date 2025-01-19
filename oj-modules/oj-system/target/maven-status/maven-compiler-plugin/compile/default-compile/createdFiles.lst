@@ -10,6 +10,7 @@ com\zmbdp\system\controller\sysuser\SysUserController.class
 com\zmbdp\system\test\service\TestService.class
 com\zmbdp\system\test\dto\ValidationDTO.class
 com\zmbdp\system\domain\user\dto\UserDTO.class
+com\zmbdp\system\elasticsearch\QuestionRepository.class
 com\zmbdp\system\domain\exam\dto\ExamQueryDTO.class
 com\zmbdp\system\service\user\IUserService.class
 com\zmbdp\system\domain\exam\dto\ExamQuestionAddDTO.class
@@ -27,6 +28,7 @@ com\zmbdp\system\utils\BCryptUtils.class
 com\zmbdp\system\domain\question\dto\QuestionEditDTO.class
 com\zmbdp\system\service\question\impl\QuestionServiceImpl.class
 com\zmbdp\system\domain\sysuser\dto\LoginDTO.class
+com\zmbdp\system\domain\question\es\QuestionES.class
 com\zmbdp\system\domain\question\dto\QuestionAddDTO.class
 com\zmbdp\system\domain\question\dto\QuestionQueryDTO.class
 com\zmbdp\system\manager\ExamCacheManager.class
@@ -37,7 +39,7 @@ com\zmbdp\system\service\exam\IExamService.class
 com\zmbdp\system\domain\sysuser\dto\SysUserSaveDTO.class
 com\zmbdp\system\controller\exam\ExamController.class
 com\zmbdp\system\domain\exam\ExamQuestion.class
-com\zmbdp\system\domain\sysuser\vo\LoginUserVO.class
+com\zmbdp\system\manager\QuestionCacheManager.class
 com\zmbdp\system\domain\question\Question.class
 com\zmbdp\system\domain\exam\dto\ExamEditDTO.class
 com\zmbdp\system\service\sysuser\ISysUserService.class

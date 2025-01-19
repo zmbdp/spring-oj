@@ -3,3 +3,4 @@
 /user-code/
 /user-code-pool/
 /deploy/dev/sql/user.sql
+deploy/dev/sql/user_actions.sql

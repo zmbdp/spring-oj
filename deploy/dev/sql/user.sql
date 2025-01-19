@@ -1,8 +1,8 @@
-CREATE USER 'zmbdp'@'%' IDENTIFIED BY '123456';
-CREATE DATABASE IF NOT EXISTS `spring_oj_dev`;
-CREATE DATABASE IF NOT EXISTS `spring_oj_nacos_local`;
-CREATE DATABASE IF NOT EXISTS `xxl_job` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+create user 'zmbdp'@'%' identified by '123456';
+create database if not exists `spring_oj_dev`;
+create database if not exists `spring_oj_nacos_local`;
+create database if not exists `xxl_job` default character set utf8mb4 collate utf8mb4_unicode_ci;
 
-GRANT CREATE, DROP, SELECT, INSERT, UPDATE, DELETE, ALTER ON spring_oj_dev.* TO 'zmbdp'@'%';
-GRANT CREATE, DROP, SELECT, INSERT, UPDATE, DELETE, ALTER ON spring_oj_nacos_local.* TO 'zmbdp'@'%';
-GRANT CREATE, DROP, SELECT, INSERT, UPDATE, DELETE, ALTER ON xxl_job.* TO 'zmbdp'@'%';
+grant create, drop, select, insert, update, delete, alter on spring_oj_dev.* to 'zmbdp'@'%';
+grant create, drop, select, insert, update, delete, alter on spring_oj_nacos_local.* to 'zmbdp'@'%';
+grant create, drop, select, insert, update, delete, alter on xxl_job.* to 'zmbdp'@'%';

@@ -1,6 +1,6 @@
 /.idea/
 /logs/
 /user-code/
-/user-code-pool/
+user-code-pool/
 /deploy/dev/sql/user.sql
 deploy/dev/sql/user_actions.sql

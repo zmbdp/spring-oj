@@ -3,3 +3,5 @@
 /user-code/
 /user-code-pool/
 deploy/dev/sql/user_actions.sql
+/deploy/test/docker-compose.yml
+/deploy/test/nacos/conf/application.properties

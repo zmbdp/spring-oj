@@ -24,4 +24,7 @@ public class SysUserSaveDTO {
     @Schema(description = "管理员密码")
     @NotBlank(message = "用户密码不能为空")
     private String password;
+    @Schema(description = "管理员昵称")
+    @NotBlank(message = "用户昵称不能为空")
+    private String nickName;
 }

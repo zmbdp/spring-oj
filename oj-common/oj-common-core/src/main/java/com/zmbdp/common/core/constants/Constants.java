@@ -27,5 +27,5 @@ public class Constants {
 
     public static final int HOST_QUESTION_LIST_START = 1;
 
-    public static final int HOST_QUESTION_LIST_END = 5;
+    public static final int HOST_QUESTION_LIST_END = 3;
 }

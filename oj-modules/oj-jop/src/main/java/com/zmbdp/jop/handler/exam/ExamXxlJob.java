@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.zmbdp.common.core.constants.CacheConstants;
 import com.zmbdp.common.core.constants.Constants;
-import com.zmbdp.common.core.domain.Result;
-import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.redis.service.RedisService;
-import com.zmbdp.common.security.exception.ServiceException;
 import com.zmbdp.jop.domain.exam.Exam;
 import com.zmbdp.jop.domain.message.Message;
 import com.zmbdp.jop.domain.message.MessageText;
@@ -167,7 +164,7 @@ public class ExamXxlJob {
 
     //刷新缓存逻辑
     public void refreshCache(List<Exam> examList, String examListKey) {
-        if (CollectionUtil.isEmpty(examList)) {
+        if (CollectionUtil.isEmpty(examList) && !examListKey.equals(CacheConstants.EXAM_UNFINISHED_LIST)) {
             return;
         }
         Map<String, Exam> examMap = new HashMap<>();

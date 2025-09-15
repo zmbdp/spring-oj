@@ -4,4 +4,5 @@
 /user-code-pool/
 deploy/dev/sql/user_actions.sql
 /deploy/test/docker-compose.yml
+/deploy/test/docker-compose02.yml
 /deploy/test/nacos/conf/application.properties

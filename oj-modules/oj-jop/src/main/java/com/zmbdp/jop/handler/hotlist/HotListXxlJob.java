@@ -9,12 +9,15 @@ import com.zmbdp.common.redis.service.RedisService;
 import com.zmbdp.jop.mapper.user.UserSubmitMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Slf4j
 @Component
+@RefreshScope
 public class HotListXxlJob {
 
     @Autowired
@@ -46,6 +49,7 @@ public class HotListXxlJob {
             }
             // 刷新缓存
             refreshHotList(hotQuestionIdList);
+            log.info("刷新成功");
         }
         log.info("----- 题目热门列表统计结束 ------");
     }

@@ -62,9 +62,11 @@ public class SandboxPoolServiceImpl implements ISandboxPoolService {
             sandBoxPool.returnContainer(containerId);
             // 然后删除这个文件
             deleteUserCodeFile();
+            log.info("判题失败");
             return SandBoxExecuteResult.fail(CodeRunStatus.COMPILE_FAILED, compileResult.getExeMessage());
         }
         // 说明编译成功，得执行代码了
+        log.info("判题成功");
         return executeJavaCodeByDocker(inputList);
     }
 
@@ -149,6 +151,7 @@ public class SandboxPoolServiceImpl implements ISandboxPoolService {
             if (memory != null) {
                 maxMemory = Math.max(maxMemory, statisticsCallback.getMaxMemory()); // 记录最大的执行用例占用内存
             }
+            log.info("(resultCallback.getMessage().trim(): {}", resultCallback.getMessage().trim());
             outList.add(resultCallback.getMessage().trim()); // 记录正确的输出结果
         }
         sandBoxPool.returnContainer(containerId);

@@ -41,6 +41,7 @@ public enum ResultCode {
     EXAM_NOT_HAS_QUESTION(3206, "禁止发布无题目的竞赛"),
     EXAM_IS_FINISH(3207, "禁止操作已结束的比赛"),
     EXAM_IS_PUBLISH(3208, "禁止操作已发布的比赛"),
+    EXAM_RANK_CALCULATING(3209, "竞赛排名正在统计中，请稍后..."),
 
     USER_EXAM_HAS_ENTER(3301, "请勿重复报名"),
 

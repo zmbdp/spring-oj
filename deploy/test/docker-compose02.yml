@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  oj-gateway:
+    image: spring/oj-gateway:0.0.1-SNAPSHOT
+    # 提供了构建上下文的路径。这意味着Docker将在./spring-oj-jar/gateway/目录中寻找构建所需的文件。
+    build:
+      context: ./spring-oj-jar/gateway/
+    container_name: oj-gateway
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 10.0.16.14
+    ports:
+      - "19090:19090"
+    privileged: true
+
+  oj-system:
+    image: spring/oj-system:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/system/
+    container_name: oj-system
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 10.0.16.14
+    ports:
+      - "9201:9201"
+    privileged: true
+
+  oj-friend:
+    image: spring/oj-friend:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/friend
+    container_name: oj-friend
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 10.0.16.14
+    ports:
+      - "9202:9202"
+    privileged: true
+
+  oj-jop:
+    image: spring/oj-jop:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/jop/
+    container_name: oj-jop
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 10.0.16.14
+    ports:
+      - "9203:9203"
+    privileged: true
+
+  oj-judge:
+    image: spring/oj-judge:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/judge/
+    container_name: oj-judge
+    volumes:
+      - /user-code-pool:/user-code-pool
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 10.0.16.14
+    privileged: true

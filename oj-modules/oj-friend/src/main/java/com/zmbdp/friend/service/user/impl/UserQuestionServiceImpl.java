@@ -28,12 +28,14 @@ import com.zmbdp.friend.mapper.question.QuestionMapper;
 import com.zmbdp.friend.mapper.user.UserSubmitMapper;
 import com.zmbdp.friend.rabbit.JudgeProducer;
 import com.zmbdp.friend.service.user.IUserQuestionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserQuestionServiceImpl extends BaseService implements IUserQuestionService {
 
@@ -87,7 +89,7 @@ public class UserQuestionServiceImpl extends BaseService implements IUserQuestio
             // 查询竞赛信息
             Exam exam = examMapper.selectById(submitDTO.getExamId());
             if (exam != null && exam.getEndTime() != null) {
-                // 检查竞赛的结束时间是否早于当前时间，并且是没有分数的，就直接制空
+                // 检查竞赛的结束时间是否早于当前时间，就直接把 竞赛id 制空
                 if (exam.getEndTime().isBefore(LocalDateTime.now())) {
                     // 如果竞赛已结束，将 submitDTO 的 examId 设置为 null
                     submitDTO.setExamId(null);
@@ -116,7 +118,21 @@ public class UserQuestionServiceImpl extends BaseService implements IUserQuestio
     public UserQuestionResultVO exeResult(Long examId, Long questionId, String currentTime) {
         // 获取用户 id
         Long userId = ThreadLocalUtil.get(Constants.USER_ID, Long.class);
+
+        if (examId != null) {
+            // 查询竞赛信息
+            Exam exam = examMapper.selectById(examId);
+            if (exam != null && exam.getEndTime() != null) {
+                // 检查竞赛的结束时间是否早于当前时间，就直接把 竞赛id 制空
+                if (exam.getEndTime().isBefore(LocalDateTime.now())) {
+                    // 如果竞赛已结束，将 submitDTO 的 examId 设置为 null
+                    examId = null;
+                }
+            }
+        }
+
         // 获取用户的提交代码，判题结果这些信息
+        log.info("userId: " + userId + "; questionId: " + questionId);
         UserSubmit userSubmit = userSubmitMapper.selectCurrentUserSubmit(userId, examId, questionId, currentTime);
         UserQuestionResultVO resultVO = new UserQuestionResultVO();
         if (userSubmit == null) {
@@ -130,6 +146,7 @@ public class UserQuestionServiceImpl extends BaseService implements IUserQuestio
                 resultVO.setUserExeResultList(JSON.parseArray(userSubmit.getCaseJudgeRes(), UserExeResult.class));
             }
         }
+        log.info("获取结果成功，题目结果为: {} ", resultVO);
         return resultVO;
     }
 

@@ -8,8 +8,13 @@ spring:
     nacos:
       discovery:
         namespace: 36b68d32-32ff-460e-80ad-9231f1251d10
-        server-addr: http://127.0.0.1:8848
+        server-addr: http://10.0.12.5:8848
+        username: nacos
+        password: Hf173503494
+        ip: ${HOST_IP}
       config:
         namespace: 36b68d32-32ff-460e-80ad-9231f1251d10
-        server-addr: http://127.0.0.1:8848
+        server-addr: http://10.0.12.5:8848
         file-extension: yaml
+        username: nacos
+        password: Hf173503494

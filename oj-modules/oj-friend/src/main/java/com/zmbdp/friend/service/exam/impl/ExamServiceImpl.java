@@ -5,8 +5,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.domain.TableDataInfo;
+import com.zmbdp.common.core.enums.ResultCode;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.utils.ThreadLocalUtil;
+import com.zmbdp.common.security.exception.ServiceException;
+import com.zmbdp.friend.domain.exam.Exam;
 import com.zmbdp.friend.domain.exam.dto.ExamQueryDTO;
 import com.zmbdp.friend.domain.exam.dto.ExamRankDTO;
 import com.zmbdp.friend.domain.exam.vo.ExamRankVO;
@@ -20,6 +23,8 @@ import com.zmbdp.friend.service.exam.IExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -139,6 +144,19 @@ public class ExamServiceImpl extends BaseService implements IExamService {
             // 没有就查数据库
             PageHelper.startPage(examRankDTO.getPageNum(), examRankDTO.getPageSize());
             examRankVOList = userExamMapper.selectExamRankList(examRankDTO.getExamId());
+            // 判断一下时间是否能返回正常的数据给前端
+            // 当前时间: LocalDateTime.now()
+            LocalDateTime now = LocalDateTime.now();
+            // 竞赛那天的24点: startOfDayNextDay
+            // 先获取到竞赛结束的时间
+            Exam exam = examMapper.selectById(examRankDTO.getExamId());
+            LocalDateTime examEndTime = exam.getEndTime();
+            // 然后根据竞赛结束的时间获取那天的24点的时间
+            LocalDateTime startOfDayNextDay = examEndTime.truncatedTo(ChronoUnit.DAYS).plusDays(1);
+            // 如果当前时间在 startOfDayNextDay 之前，就进入 if
+            if (now.isBefore(startOfDayNextDay)) {
+                throw new ServiceException(ResultCode.EXAM_RANK_CALCULATING);
+            }
             examCacheManager.refreshExamRankCache(examRankDTO.getExamId());
             total = new PageInfo<>(examRankVOList).getTotal();
         } else {

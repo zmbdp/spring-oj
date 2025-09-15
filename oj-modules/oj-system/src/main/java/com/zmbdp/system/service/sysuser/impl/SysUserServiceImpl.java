@@ -2,6 +2,7 @@ package com.zmbdp.system.service.sysuser.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.zmbdp.common.core.constants.Constants;
 import com.zmbdp.common.core.service.BaseService;
 import com.zmbdp.common.core.domain.LoginUser;
 import com.zmbdp.common.core.domain.Result;
@@ -76,6 +77,8 @@ public class SysUserServiceImpl extends BaseService implements ISysUserService {
         // 然后再把密码给加密好放到 user 对象里面
         sysUser.setUserAccount(sysUserSaveDTO.getUserAccount());
         sysUser.setPassword(password);
+        sysUser.setNickName(sysUserSaveDTO.getNickName());
+        sysUser.setCreateBy(Constants.SYSTEM_USER_ID);
         // 再添加到数据库中
         return toResult(sysUserMapper.insert(sysUser));
     }

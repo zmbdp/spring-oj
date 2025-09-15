@@ -1,0 +1,18 @@
+﻿CidrBlock,Protocol,Port,Action,FirewallRuleDescription
+0.0.0.0/0,TCP,19090,ACCEPT,spring-oj项目
+0.0.0.0/0,TCP,2375,ACCEPT,dockerJdk
+0.0.0.0/0,TCP,5672,ACCEPT,rabbitMQ
+0.0.0.0/0,TCP,10020,ACCEPT,rabbitMQ
+0.0.0.0/0,TCP,10010,ACCEPT,kibana
+0.0.0.0/0,TCP,6379,ACCEPT,redis
+0.0.0.0/0,TCP,10030,ACCEPT,nginx
+0.0.0.0/0,TCP,9200,ACCEPT,elasticsearch
+0.0.0.0/0,TCP,3306,ACCEPT,nysql
+0.0.0.0/0,TCP,9848,ACCEPT,nacos
+0.0.0.0/0,TCP,8848,ACCEPT,nacos用户
+0.0.0.0/0,TCP,80,ACCEPT,Web服务HTTP (80)，如 Apache、Nginx
+0.0.0.0/0,TCP,443,ACCEPT,Web服务HTTPS (443)，如 Apache、Nginx
+0.0.0.0/0,TCP,22,ACCEPT,Linux SSH登录
+0.0.0.0/0,TCP,3389,ACCEPT,Windows远程桌面登录
+0.0.0.0/0,UDP,3389,ACCEPT,Windows远程桌面登录优化
+0.0.0.0/0,ICMP,ALL,ACCEPT,通过Ping测试网络连通性 (放通ALL ICMP)

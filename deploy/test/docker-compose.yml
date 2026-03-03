@@ -1,0 +1,235 @@
+version: '3.8'
+
+services:
+  oj-mysql-server:
+    image: mysql:5.7
+    container_name: oj-mysql-server
+    environment:
+      # 时区上海
+      TZ: Asia/Shanghai
+      # root 密码
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes:
+      # 数据挂载
+      - ./mysql/mysqldata/:/var/lib/mysql/
+    # 配置MySQL 服务器的字符集与排序规则
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+    # 通过执行特定的 MySQL 命令来检查服务的健康状态，用于测试连接到 MySQL 服务器
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u", "root", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  oj-nacos-server:
+    image: nacos/nacos-server:v2.2.2  # 替换为 Nacos 的 Docker 镜像名及版本
+    container_name: oj-nacos-server
+    environment:
+      - MODE=standalone
+      - JVM_XMS=256m
+      - JVM_XMX=256m
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - MYSQL_SERVICE_HOST=oj-mysql-server
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_DB_NAME=spring_oj_nacos_local
+      - MYSQL_SERVICE_USER=zmbdp
+      - MYSQL_SERVICE_PASSWORD=123456
+    volumes:
+      - ./nacos/conf/application.properties:/home/nacos/conf/application.properties  # 将 Nacos 配置文件挂载到容器中
+    ports:
+      - "8848:8848"  # 映射容器的 8848 端口到主机
+      - "9848:9848"  # 映射容器的 9848 端口到主机
+    depends_on:
+      oj-mysql-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos"]  # 健康检查，确认 Nacos 服务是否正常
+      interval: 30s  # 每 30 秒检查一次
+      timeout: 10s   # 每次健康检查的超时时间为 10 秒
+      retries: 10     # 如果健康检查失败，最多重试 10 次
+
+  oj-xxl-job-server:
+    container_name: oj-xxl-job-server
+    image: xuxueli/xxl-job-admin:2.4.0
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://oj-mysql-server:3306/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=zmbdp
+      - SPRING_DATASOURCE_PASSWORD=123456
+    ports:
+      - "8080:8080"
+    depends_on:
+      oj-mysql-server:
+        condition: service_healthy
+
+  oj-redis-server:
+    container_name: oj-redis-server
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+    environment:
+      REQUIREPASS: 123456
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  oj-gateway:
+    image: spring/oj-gateway:0.0.1-SNAPSHOT
+    # 提供了构建上下文的路径。这意味着Docker将在./spring-oj-jar/gateway/目录中寻找构建所需的文件。
+    build:
+      context: ./spring-oj-jar/gateway/
+    container_name: oj-gateway
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 服务器内网ip
+    ports:
+      - "19090:19090"
+    privileged: true
+    depends_on:
+      oj-nacos-server:
+        condition: service_healthy
+      oj-redis-server:
+        condition: service_healthy
+
+  oj-nginx-server:
+    image: nginx:1.21
+    container_name: oj-nginx-server
+    volumes:
+      - ./nginx/conf/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/dist:/home/dist
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "80:80"
+      - "10030:10030"
+      - "443:443"
+    privileged: true
+    depends_on:
+      - oj-gateway
+
+  oj-elasticsearch-server:
+    container_name: oj-elasticsearch-server
+    image: elasticsearch:8.5.3
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./elasticsearch/es-plugins:/usr/share/elasticsearch/plugins
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms256m -Xmx256m"
+      xpack.security.enabled: false
+    healthcheck:
+      test: [ "CMD", "curl", "-s", "http://localhost:9200/_cluster/health?wait_for_status=green&timeout=1s" ]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+
+  oj-kibana-server:
+    image: kibana:8.5.3
+    container_name: oj-kibana-server
+    ports:
+      - "10010:5601"
+    depends_on:
+      oj-elasticsearch-server:
+        condition: service_healthy
+    environment:
+      I18N_LOCALE: zh-CN
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+
+  oj-rabbitMQ-server:
+    container_name: oj-rabbitMQ-server
+    image: rabbitmq:3.8.30-management
+    ports:
+      - "5672:5672"
+      - "10020:15672"
+    volumes:
+      - ./rabbit/data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: zmbdp
+      RABBITMQ_DEFAULT_PASS: Hf173503494
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  oj-system:
+    image: spring/oj-system:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/system/
+    container_name: oj-system
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 服务器内网ip
+    ports:
+      - "9201:9201"
+    privileged: true
+    depends_on:
+      oj-nacos-server:
+        condition: service_healthy
+      oj-redis-server:
+        condition: service_healthy
+      oj-elasticsearch-server:
+        condition: service_healthy
+
+  oj-friend:
+    image: spring/oj-friend:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/friend
+    container_name: oj-friend
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 服务器内网ip
+    ports:
+      - "9202:9202"
+    privileged: true
+    depends_on:
+      oj-nacos-server:
+        condition: service_healthy
+      oj-redis-server:
+        condition: service_healthy
+      oj-elasticsearch-server:
+        condition: service_healthy
+      oj-rabbitMQ-server:
+        condition: service_healthy
+
+  oj-jop:
+    image: spring/oj-jop:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/jop/
+    container_name: oj-jop
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 服务器内网ip
+    ports:
+      - "9203:9203"
+    privileged: true
+    depends_on:
+      oj-nacos-server:
+        condition: service_healthy
+      oj-redis-server:
+        condition: service_healthy
+
+  oj-judge:
+    image: spring/oj-judge:0.0.1-SNAPSHOT
+    build:
+      context: ./spring-oj-jar/judge/
+    container_name: oj-judge
+    volumes:
+      - /user-code-pool:/user-code-pool
+    environment:
+      TZ: Asia/Shanghai
+      HOST_IP: 服务器内网ip
+    privileged: true
+    depends_on:
+      oj-nacos-server:
+        condition: service_healthy
+      oj-rabbitMQ-server:
+        condition: service_healthy

@@ -1,0 +1,50 @@
+server:
+  port: 9202
+
+jwt:
+  secret: zxcvbnmasdfghjuiyreqtuiwq
+
+spring:
+  data:
+    redis:
+      host: 服务器内网ip
+      password: 123456
+  datasource:
+    url: jdbc:mysql://服务器内网ip:3306/spring_oj_dev?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=GMT%2B8
+    username: zmbdp
+    password: 123456
+  elasticsearch:
+    uris: http://服务器内网ip:9200
+  rabbitmq:
+    host: 服务器内网ip
+    port: 5672
+    username: zmbdp
+    password: Hf173503494
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+sms:
+  code-expiration: 5
+  send-limit: 3
+  is-send: false
+  aliyun:
+    accessKeyId: 你的AK
+    accessKeySecret: 你的SK
+    endpoint: 你的域名
+    templateCode: 你的模板code
+    sing-name: 你的签名
+
+file:
+  max-time: 3
+  test: true
+  oss:
+    endpoint: 你的域名
+    region: 你的地域
+    accessKeyId: 你的AK
+    accessKeySecret: 你的SK
+    bucketName: 你的存储桶
+    pathPrefix: 你的文件前缀
+    downloadUrl: 你的下载地址

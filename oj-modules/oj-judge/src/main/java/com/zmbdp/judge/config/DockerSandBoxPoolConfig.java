@@ -14,7 +14,7 @@ public class DockerSandBoxPoolConfig {
     @Value("${sandbox.docker.host:tcp://localhost:2375}")
     private String dockerHost;
 
-    @Value("${sandbox.docker.image:openjdk:8-jdk-alpine}")
+    @Value("${sandbox.docker.image:openjdk:8u151-jdk}")
     private String sandboxImage;
 
     @Value("${sandbox.docker.volume:/usr/share/java}")

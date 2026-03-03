@@ -21,8 +21,8 @@ create table tb_sys_user
     unique key `idx_user_account` (`user_account`)
 ) engine = innodb default character set = utf8mb4 comment = '管理员的用户表';
 
-insert into spring_oj_dev.tb_sys_user (user_id, user_account, password, create_by, create_time, update_by, update_time)
-values (522399972612771842, 'zhangsan', '$2a$10$Nqf804r/D6jyF8A2rUlqZOsgEHcarQ1v/tX6OQIu3QSBnDVBAtb4u', 0,
+insert into spring_oj_dev.tb_sys_user (user_id, user_account, nick_name, password, create_by, create_time, update_by, update_time)
+values (522399972612771842, 'zhangsan', '超级管理员', '$2a$10$Nqf804r/D6jyF8A2rUlqZOsgEHcarQ1v/tX6OQIu3QSBnDVBAtb4u', 0,
         '2024-11-07 10:30:00', 0,
         '2024-11-07 10:30:00');
 
@@ -175,12 +175,3 @@ create table tb_user_submit
     update_time  datetime comment '更新时间',
     primary key (`submit_id`)
 ) engine = innodb default character set = utf8mb4 comment = '用户提交表';
-
-
-
-
-
-
-
-
-

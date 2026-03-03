@@ -1,0 +1,41 @@
+server:
+  port: 19090
+
+spring:
+  data:
+    redis:
+      host: 服务器内网ip
+      password: 123456
+  cloud:
+    gateway:
+      routes:
+        # 管理模块
+        - id: oj-system
+          uri: lb://oj-system
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+        - id: oj-friend
+          uri: lb://oj-friend
+          predicates:
+            - Path=/friend/**
+          filters:
+            - StripPrefix=1
+        - id: oj-judge
+          uri: lb://oj-judge
+          predicates:
+            - Path=/judge/**
+
+jwt:
+  secret: zxcvbnmasdfghjuiyreqtuiwq
+
+security:
+  ignore:
+    whites:
+      - /system/sysUser/login
+      - /**/login
+      - /**/test/**
+      - /friend/user/sendCode
+      - /friend/user/code/login
+      - /**/semiLogin/**

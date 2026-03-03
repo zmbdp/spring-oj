@@ -9,7 +9,7 @@ services:
     container_name: oj-gateway
     environment:
       TZ: Asia/Shanghai
-      HOST_IP: 10.0.16.14
+      HOST_IP: 服务器内网ip
     ports:
       - "19090:19090"
     privileged: true
@@ -21,7 +21,7 @@ services:
     container_name: oj-system
     environment:
       TZ: Asia/Shanghai
-      HOST_IP: 10.0.16.14
+      HOST_IP: 服务器内网ip
     ports:
       - "9201:9201"
     privileged: true
@@ -33,7 +33,7 @@ services:
     container_name: oj-friend
     environment:
       TZ: Asia/Shanghai
-      HOST_IP: 10.0.16.14
+      HOST_IP: 服务器内网ip
     ports:
       - "9202:9202"
     privileged: true
@@ -45,7 +45,7 @@ services:
     container_name: oj-jop
     environment:
       TZ: Asia/Shanghai
-      HOST_IP: 10.0.16.14
+      HOST_IP: 服务器内网ip
     ports:
       - "9203:9203"
     privileged: true
@@ -59,5 +59,5 @@ services:
       - /user-code-pool:/user-code-pool
     environment:
       TZ: Asia/Shanghai
-      HOST_IP: 10.0.16.14
+      HOST_IP: 服务器内网ip
     privileged: true

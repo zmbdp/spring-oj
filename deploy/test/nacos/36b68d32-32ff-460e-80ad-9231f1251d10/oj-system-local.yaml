@@ -1,0 +1,17 @@
+server:
+  port: 9201
+
+spring:
+  data:
+    redis:
+      host: 服务器内网ip
+      password: 123456
+  datasource:
+    url: jdbc:mysql://服务器内网ip:3306/spring_oj_dev?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=GMT%2B8
+    username: zmbdp
+    password: 123456
+  elasticsearch:
+    uris: http://服务器内网ip:9200
+
+jwt:
+  secret: zxcvbnmasdfghjuiyreqtuiwq

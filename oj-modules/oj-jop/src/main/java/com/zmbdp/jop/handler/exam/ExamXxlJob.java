@@ -61,7 +61,11 @@ public class ExamXxlJob {
                 .eq(Exam::getStatus, Constants.TRUE)
                 .orderByAsc(Exam::getCreateTime)
         );
-        refreshCache(unFinishList, CacheConstants.EXAM_UNFINISHED_LIST);
+        if (CollectionUtil.isNotEmpty(unFinishList)) {
+            refreshCache(unFinishList, CacheConstants.EXAM_UNFINISHED_LIST);
+        } else {
+            log.info("*** 获取未完赛列表为空 ***");
+        }
         // 第二个是过期了的比赛
         List<Exam> historyList = examMapper.selectList(new LambdaQueryWrapper<Exam>()
                 .select(Exam::getExamId, Exam::getTitle, Exam::getStartTime, Exam::getEndTime)
@@ -69,7 +73,11 @@ public class ExamXxlJob {
                 .eq(Exam::getStatus, Constants.TRUE)
                 .orderByAsc(Exam::getCreateTime)
         );
-        refreshCache(historyList, CacheConstants.EXAM_HISTORY_LIST);
+        if (CollectionUtil.isNotEmpty(historyList)) {
+            refreshCache(historyList, CacheConstants.EXAM_HISTORY_LIST);
+        } else {
+            log.info("*** 获取历史列表为空 ***");
+        }
         log.info("*** examListOrganizeHandler 统计结束 ***");
     }
 

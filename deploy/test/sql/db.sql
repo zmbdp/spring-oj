@@ -545,6 +545,68 @@ VALUES
     System.out.println(s.fastPower(a,b));
 }', 522399972612771842, '2026-03-03 17:10:00', 522399972612771842, '2026-03-03 17:10:00');
 
+INSERT INTO spring_oj_dev.tb_question
+(question_id, title, difficulty, time_limit, space_limit, content, question_case, default_code, main_fuc, create_by,
+ create_time, update_by, update_time)
+VALUES (2028730000000000001, '绝对值', 1, 1000000, 100000000, '<p>计算一个整数的绝对值</p>',
+        '[{"input":"-5","output":"5"},{"input":"10","output":"10"}]', 'class Solution {
+    public int abs(int var0) {
+
+    }
+}', 'public static void main(String[] var0) {
+    Solution s = new Solution();
+    int a = Integer.parseInt(var0[0]);
+    System.out.println(s.abs(a));
+}', 522399972612771842, '2026-03-03 16:00:00', 522399972612771842, '2026-03-03 16:00:00'),
+
+       (2028730000000000002, '两数最小值', 1, 1000000, 100000000, '<p>返回两个整数中的较小值</p>',
+        '[{"input":"5 9","output":"5"},{"input":"10 3","output":"3"}]', 'class Solution {
+    public int min(int var0, int var1) {
+
+    }
+}', 'public static void main(String[] var0) {
+    Solution s = new Solution();
+    int a = Integer.parseInt(var0[0]);
+    int b = Integer.parseInt(var0[1]);
+    System.out.println(s.min(a, b));
+}', 522399972612771842, '2026-03-03 16:05:00', 522399972612771842, '2026-03-03 16:05:00'),
+
+       (2028730000000000003, '取平方', 1, 1000000, 100000000, '<p>计算一个整数的平方</p>',
+        '[{"input":"3","output":"9"},{"input":"-4","output":"16"}]', 'class Solution {
+    public int square(int var0) {
+
+    }
+}', 'public static void main(String[] var0) {
+    Solution s = new Solution();
+    int a = Integer.parseInt(var0[0]);
+    System.out.println(s.square(a));
+}', 522399972612771842, '2026-03-03 16:10:00', 522399972612771842, '2026-03-03 16:10:00'),
+
+       (2028730000000000004, '求余数', 1, 1000000, 100000000, '<p>计算 var0 除以 var1 的余数</p>',
+        '[{"input":"10 3","output":"1"},{"input":"20 5","output":"0"}]', 'class Solution {
+    public int mod(int var0, int var1) {
+
+    }
+}', 'public static void main(String[] var0) {
+    Solution s = new Solution();
+    int a = Integer.parseInt(var0[0]);
+    int b = Integer.parseInt(var0[1]);
+    System.out.println(s.mod(a, b));
+}', 522399972612771842, '2026-03-03 16:15:00', 522399972612771842, '2026-03-03 16:15:00'),
+
+       (2028730000000000005, '交换两个数', 1, 1000000, 100000000, '<p>返回一个数组，数组顺序交换两个整数</p>',
+        '[{"input":"3 5","output":"[5,3]"},{"input":"10 2","output":"[2,10]"}]', 'class Solution {
+    public int[] swap(int var0, int var1) {
+
+    }
+}', 'public static void main(String[] var0) {
+    Solution s = new Solution();
+    int a = Integer.parseInt(var0[0]);
+    int b = Integer.parseInt(var0[1]);
+    int[] res = s.swap(a, b);
+    System.out.println(Arrays.toString(res));
+}', 522399972612771842, '2026-03-03 16:20:00', 522399972612771842, '2026-03-03 16:20:00');
+
 -- 竞赛相关的
 drop table if exists tb_exam;
 create table tb_exam

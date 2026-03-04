@@ -141,7 +141,7 @@ services:
         condition: service_healthy
     environment:
       I18N_LOCALE: zh-CN
-      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://oj-elasticsearch-server:9200
 
   oj-rabbitMQ-server:
     container_name: oj-rabbitMQ-server

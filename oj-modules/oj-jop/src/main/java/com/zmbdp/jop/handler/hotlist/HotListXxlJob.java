@@ -47,7 +47,11 @@ public class HotListXxlJob {
                         caller.getLineNumber());
             }
             // 刷新缓存
-            refreshHotList(hotQuestionIdList);
+            if (!hotQuestionIdList.isEmpty()){
+                refreshHotList(hotQuestionIdList);
+            } else {
+                log.info("热门列表没有数据");
+            }
             log.info("刷新成功");
         }
         log.info("----- 题目热门列表统计结束 ------");

@@ -8,13 +8,13 @@ spring:
     nacos:
       discovery:
         namespace: spring-oj
-        server-addr: http://服务器内网ip:8848
+        server-addr: oj-nacos-server:8848
         username: nacos
         password: Hf173503494
         ip: ${HOST_IP}
       config:
         namespace: spring-oj
-        server-addr: http://服务器内网ip:8848
+        server-addr: oj-nacos-server:8848
         file-extension: yaml
         username: nacos
         password: Hf173503494

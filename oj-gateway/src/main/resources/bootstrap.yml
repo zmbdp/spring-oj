@@ -8,13 +8,13 @@ spring:
     nacos:
       discovery:
         namespace: spring-oj  # nacos服务管理的命名空间 (下面的)
-        server-addr: http://服务器内网ip:8848 # nacos 地址
+        server-addr: oj-nacos-server:8848 # nacos 地址
         username: nacos # nacos 用户名
         password: Hf173503494 # nacos 密码
         ip: ${HOST_IP} # 本机 ip 地址
       config:
         namespace: spring-oj # nacos配置管理的命名空间 (上面的)
-        server-addr: http://服务器内网ip:8848 # nacos 地址
+        server-addr: oj-nacos-server:8848 # nacos 地址
         file-extension: yaml # 配置文件格式
         username: nacos # nacos 用户名
         password: Hf173503494 # nacos 密码

@@ -318,12 +318,28 @@ INSERT INTO `xxl_job_info`(`id`, `job_group`, `job_desc`, `add_time`, `update_ti
 VALUES (1, 1, '测试任务1', '2018-11-03 22:21:31', '2018-11-03 22:21:31', 'XXL', '', 'CRON', '0 0 0 * * ? *',
         'DO_NOTHING', 'FIRST', 'demoJobHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化',
         '2018-11-03 22:21:31', '');
+INSERT INTO `xxl_job_group` (`id`, `app_name`, `title`, `address_type`, `update_time`)
+VALUES (2, 'oj-job-executor', '在线oj定时任务', 0, '2026-07-26 13:44:26');
 
 INSERT INTO `xxl_job_user`(`id`, `username`, `password`, `role`, `permission`)
 VALUES (1, 'admin', '374e9f392a65dbc1c48eb9bcbf90a9ee', 1, NULL);
 
 INSERT INTO `xxl_job_lock` (`lock_name`)
 VALUES ('schedule_lock');
+INSERT INTO `xxl_job_info` (`id`, `job_group`, `job_desc`, `add_time`, `update_time`, `author`, `alarm_email`,
+                            `schedule_type`, `schedule_conf`, `misfire_strategy`, `executor_route_strategy`,
+                            `executor_handler`, `executor_param`, `executor_block_strategy`, `executor_timeout`,
+                            `executor_fail_retry_count`, `glue_type`, `glue_source`, `glue_remark`, `glue_updatetime`,
+                            `child_jobid`, `trigger_status`, `trigger_last_time`, `trigger_next_time`)
+VALUES (2, 2, '刷新热榜排行', '2026-03-10 13:28:31', '2026-03-10 13:28:37', '稚名不带撇', '', 'CRON', '0 0 0/2 * * ?',
+        'DO_NOTHING', 'FIRST', 'hotQuestionListHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '', 'GLUE代码初始化',
+        '2026-03-10 13:28:31', '', 1, 1785038400000, 1785045600000),
+       (3, 2, '刷新用户消息', '2026-03-10 13:29:18', '2026-03-10 13:30:10', '稚名不带撇', 'javafuhao@gmail.com', 'CRON',
+        '0 0 4 * * ?', 'DO_NOTHING', 'FIRST', 'examResultHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '',
+        'GLUE代码初始化', '2026-03-10 13:29:18', '', 1, 1785009600000, 1785096000000),
+       (4, 2, '更新竞赛列表', '2026-03-10 13:30:03', '2026-03-10 13:30:07', '稚名不带撇', 'javafuhao@gmail.com', 'CRON',
+        '0 0 0/2 * * ?', 'DO_NOTHING', 'FIRST', 'examListOrganizeHandler', '', 'SERIAL_EXECUTION', 0, 0, 'BEAN', '',
+        'GLUE代码初始化', '2026-03-10 13:30:03', '', 1, 1785038400000, 1785045600000)
 
 -- 要求：表名小写、多个单词用下划线隔开、全部都以 tb 开头
 create

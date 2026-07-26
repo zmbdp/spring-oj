@@ -4,14 +4,14 @@ server:
 spring:
   data:
     redis:
-      host: 服务器内网ip
+      host: oj-redis-server
       password: 123456
   datasource:
-    url: jdbc:mysql://服务器内网ip:3306/spring_oj_dev?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://oj-mysql-server:3306/spring_oj_dev?useUnicode=true&characterEncoding=utf8&useSSL=true&serverTimezone=GMT%2B8
     username: zmbdp
     password: 123456
   elasticsearch:
-    uris: http://服务器内网ip:9200
+    uris: http://oj-elasticsearch-server:9200
 
 jwt:
-  secret: zxcvbnmasdfghjuiyreqtuiwq
+  secret: 8af963bb1e8543588f35f07af26e87fb8af963bb1e8543588f35f07af26e87fb
